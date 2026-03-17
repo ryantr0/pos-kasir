@@ -53,28 +53,62 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 <span class="text-sm font-medium">Laporan Keuangan</span>
             </a>
-        </nav>
 
-        <div class="p-4 border-t border-slate-100">
-            <div class="flex items-center space-x-3 px-2 mb-4">
-                <div class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-[10px] font-bold">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
-                </div>
-                <p class="text-xs font-bold text-slate-800 truncate">{{ Auth::user()->name }}</p>
-            </div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="w-full py-2 border border-slate-200 text-xs font-bold text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition">LOGOUT</button>
-            </form>
+            <a href="{{ route('purchases.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition {{ request()->routeIs('purchases.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                <span class="text-sm font-medium">Belanja Barang</span>
+            </a>
+        </nav>
+<div class="p-4 border-t border-slate-100">
+    <div class="flex items-center space-x-3 px-2 mb-4">
+        <div class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-[10px] font-bold">
+            {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
         </div>
+        <div class="overflow-hidden">
+            <p class="text-xs font-bold text-slate-800 truncate">{{ Auth::user()->name }}</p>
+            <p class="text-[10px] text-slate-500 truncate">{{ Auth::user()->email }}</p>
+        </div>
+    </div>
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="w-full py-2 border border-slate-200 text-xs font-bold text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-100 rounded-lg transition">
+            LOGOUT
+        </button>
+    </form>
+</div>
+        
     </aside>
 
     <main class="flex-1 overflow-y-auto">
-        <header class="h-16 flex items-center justify-between px-8 bg-white border-b border-slate-200 sticky top-0 z-10">
-            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-widest">Daftar Produk</h2>
+        <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+            <div>
+                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Daftar produk</h2>
+                <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
+            </div>
+
             <a href="{{ route('products.create') }}" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-black transition shadow-sm">
                 + TAMBAH PRODUK BARU
             </a>
+
+            <div class="flex items-center space-x-3">              
+                <div class="hidden md:flex flex-col items-end border-r border-slate-200 pr-3">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Hari ini</span>
+                    <span id="realtime-date" class="text-[11px] font-extrabold text-slate-700 uppercase">
+                        {{ date('l, d M Y') }} {{-- Tetap ada buat tampilan awal --}}
+                    </span>
+                </div>
+
+                <div class="bg-slate-900 px-4 py-2 rounded-xl shadow-lg shadow-slate-200 flex items-center space-x-2 border border-slate-800">
+                    <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <span id="realtime-clock" class="text-sm font-black text-white tabular-nums tracking-widest">
+                        00:00:00
+                    </span>
+                </div>
+            </div>
+        
+            
         </header>
 
         <div class="p-8">
@@ -141,5 +175,30 @@
         </div>
     </main>
 </div>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        
+        // --- Bagian Jam ---
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('realtime-clock').textContent = `${hours}:${minutes}:${seconds}`;
+        
+        // --- Bagian Tanggal (Update otomatis kalau ganti hari) ---
+        const options = { weekday: 'long', year: 'numeric', month: 'short', day: '2-digit' };
+        // Format: Monday, 17 Mar 2026
+        const dateString = now.toLocaleDateString('en-GB', options); 
+        
+        const dateElement = document.getElementById('realtime-date');
+        if (dateElement) {
+            dateElement.textContent = dateString;
+        }
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>
 </body>
 </html>

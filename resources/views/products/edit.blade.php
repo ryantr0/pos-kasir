@@ -24,33 +24,25 @@
     <div>
         <h1 class="text-xl font-black tracking-tighter text-slate-800 leading-none">WARUNG RZ</h1>
         <div class="flex items-center justify-center space-x-1 mt-2">
-            <span class="h-px w-3 bg-slate-200"></span>
-            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Point of Sale</p>
-            <span class="h-px w-3 bg-slate-200"></span>
+            
         </div>
     </div>
 </div>
         
         <nav class="flex-1 px-4 space-y-1">
-            <div class="px-3 py-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Utama</div>
-            <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition outline-none focus:ring-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                </svg>
-                <span class="text-sm font-medium">Dashboard</span>
-            </a>
-            <a href="{{ route('products.index') }}" class="flex items-center space-x-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                <span class="text-sm font-medium">Produk</span>
-            </a>
-        </nav>
+    <a href="{{ route('products.index') }}" 
+       class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 
+       {{ request()->routeIs('products.*') ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+        
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        
+        <span class="text-sm font-medium">Produk</span>
+    </a>
+</nav>
 
-        <div class="p-4 border-t border-slate-100">
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="w-full py-2 border border-slate-200 text-xs font-bold text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition uppercase">LOGOUT</button>
-            </form>
-        </div>
+        
     </aside>
 
     <main class="flex-1 overflow-y-auto">

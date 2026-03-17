@@ -11,10 +11,12 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\KasirController;
+use App\Http\Controllers\PurchaseController;
 
 // Redirect ke login jika belum ada session, atau ke dashboard jika sudah login
 Route::get('/', function () {
     return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
+    
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -57,6 +59,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/profile', 'edit')->name('profile.edit');
         Route::patch('/profile', 'update')->name('profile.update');
         Route::delete('/profile', 'destroy')->name('profile.destroy');
+
+        Route::get('/api/categories/{id}/products', function ($id) {
+        return Product::where('category_id', $id)->get();
+    });
     
 
 }); // Penutup Middleware Group yang bener
@@ -94,6 +100,10 @@ require __DIR__.'/auth.php';
         Route::patch('/profile', 'update')->name('profile.update');
         Route::delete('/profile', 'destroy')->name('profile.destroy');
     });
+
+
+    Route::get('/purchases/download-pdf', [PurchaseController::class, 'downloadPDF'])->name('purchases.pdf');
+    Route::resource('purchases', PurchaseController::class);
 });
 
 require __DIR__.'/auth.php';

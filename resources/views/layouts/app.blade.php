@@ -88,7 +88,7 @@
                 </header>
 
                 <main class="p-4 lg:p-8">
-                    {{ $slot }}
+                    @yield('content')
                 </main>
             </div>
         </div>

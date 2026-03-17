@@ -45,10 +45,7 @@
                 </svg>
                 <span class="text-sm font-medium">Dashboard</span>
             </a>
-            
-
-            
-
+        
             <a href="{{ route('kasir.index') }}" 
             class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition {{ request()->routeIs('kasir.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
@@ -74,6 +71,13 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 <span class="text-sm font-medium">Laporan Keuangan</span>
             </a>
+
+            <a href="{{ route('purchases.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition {{ request()->routeIs('purchases.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }} ">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                <span class="text-sm font-medium">Belanja Barang</span>
+            </a>
         </nav>
 
         <div class="p-4 border-t border-slate-100">
@@ -96,10 +100,26 @@
     </aside>
 
     <main class="flex-1 overflow-y-auto">
-        <header class="h-16 flex items-center justify-between px-8 bg-white border-b border-slate-200 sticky top-0 z-10">
-            <h2 class="text-sm font-semibold text-slate-800">Dashboard Overview</h2>
-            <div class="text-[11px] font-medium text-slate-500 bg-slate-50 px-3 py-1 rounded-md border border-slate-100">
-                {{ date('l, d M Y') }}
+        <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+            <div>
+                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Dashboard Overview</h2>
+                <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
+            </div>
+
+            <div class="flex items-center space-x-3">              
+                <div class="hidden md:flex flex-col items-end border-r border-slate-200 pr-3">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Hari ini</span>
+                    <span id="realtime-date" class="text-[11px] font-extrabold text-slate-700 uppercase">
+                        {{ date('l, d M Y') }} {{-- Tetap ada buat tampilan awal --}}
+                    </span>
+                </div>
+
+                <div class="bg-slate-900 px-4 py-2 rounded-xl shadow-lg shadow-slate-200 flex items-center space-x-2 border border-slate-800">
+                    <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <span id="realtime-clock" class="text-sm font-black text-white tabular-nums tracking-widest">
+                        00:00:00
+                    </span>
+                </div>
             </div>
         </header>
 
@@ -241,6 +261,31 @@
         </div>
     </main>
 </div>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        
+        // --- Bagian Jam ---
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('realtime-clock').textContent = `${hours}:${minutes}:${seconds}`;
+        
+        // --- Bagian Tanggal (Update otomatis kalau ganti hari) ---
+        const options = { weekday: 'long', year: 'numeric', month: 'short', day: '2-digit' };
+        // Format: Monday, 17 Mar 2026
+        const dateString = now.toLocaleDateString('en-GB', options); 
+        
+        const dateElement = document.getElementById('realtime-date');
+        if (dateElement) {
+            dateElement.textContent = dateString;
+        }
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>
 
 </body>
 </html>

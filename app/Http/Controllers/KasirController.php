@@ -55,19 +55,22 @@ class KasirController extends Controller
     }
 
     public function store(Request $request) {
-    // 1. Tambahin validasi biar data yang masuk nggak kosong/ngaco
+    // 1. Validasi tetap sama (Ditambahkan validasi payment_method agar aman)
     $request->validate([
         'customer' => 'required|string|max:255', 
         'total_price' => 'required|numeric',
         'items' => 'required|array',
+        'payment_method' => 'required', // <--- Tambahkan ini agar wajib milih CASH/QRIS
     ]);
 
     try {
-        \DB::transaction(function () use ($request) { // Tambah backslash \DB biar gak error
-            // 2. Simpan order dengan nama customer dari input
+        \DB::transaction(function () use ($request) {
+            // 2. Simpan order dengan tambahan user_id dan payment_method
             $order = \App\Models\Order::create([
                 'customer' => $request->customer, 
                 'total_price' => $request->total_price,
+                'user_id' => auth()->id(), 
+                'payment_method' => $request->payment_method, // <--- INI KUNCINYA: Biar QRIS masuk laporan!
             ]);
 
             foreach ($request->items as $item) {
@@ -78,11 +81,10 @@ class KasirController extends Controller
                     $product->decrement('stock', $item['qty']); 
                     $product->increment('sold', $item['qty']);
                     
-                    // 4. AKTIFKAN & SESUAIKAN: Simpan ke tabel order_details
-                    // Pakai relasi items() yang sudah kita buat di Model Order
+                    // 4. Simpan ke tabel order_details lewat relasi
                     $order->items()->create([
                         'product_id' => $product->id,
-                        'quantity'   => $item['qty'], // Sesuaikan nama kolom tabel lo (quantity)
+                        'quantity'   => $item['qty'],
                         'price'      => $product->price,
                     ]);
                 }
@@ -95,11 +97,15 @@ class KasirController extends Controller
         ]);
 
     } catch (\Exception $e) {
-        // 5. Kalau ada error, transaksi dibatalkan otomatis
         return response()->json([
             'status' => 'error',
             'message' => 'Gagal simpan transaksi: ' . $e->getMessage()
         ], 500);
     }
 }
+
+
+
+
+
 }

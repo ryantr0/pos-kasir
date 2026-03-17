@@ -11,19 +11,19 @@
     </style>
 </head>
 <body class="bg-[#f8fafc] antialiased text-slate-900">
-
     <div class="min-h-screen flex flex-col justify-center items-center p-6">
         <div class="mb-8 text-center">
             <h1 class="text-3xl font-bold tracking-tight text-slate-900 uppercase">WARUNG RZ</h1>
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Point of Sale System</p>
+            
         </div>
 
         <div class="w-full sm:max-w-md bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden">
             <div class="p-8">
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold text-slate-800">Login Administrator</h2>
-                    <p class="text-sm text-slate-500 mt-1">Silakan masukkan akun Anda untuk akses dashboard.</p>
-                </div>
+                <div class="mb-8 text-center"> {{-- Tambahkan text-center di sini --}}
+                <h2 class="text-xl font-bold text-slate-800 uppercase tracking-tight">
+                    LOGIN
+                </h2>
+            </div>  
 
                 @if (session('status'))
                     <div class="mb-4 font-medium text-sm text-green-600">
@@ -38,7 +38,7 @@
                         <label for="email" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Email Address</label>
                         <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" 
                             class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition outline-none placeholder:text-slate-300"
-                            placeholder="nama@email.com">
+                            >
                         @if($errors->has('email'))
                             <p class="mt-2 text-xs text-red-500 font-medium">{{ $errors->first('email') }}</p>
                         @endif
@@ -75,12 +75,10 @@
                 </form>
             </div>
 
-            <div class="bg-slate-50 border-t border-slate-100 p-4 text-center">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Authorized Access Only</p>
-            </div>
+            
         </div>
 
-        <p class="mt-8 text-[11px] text-slate-400 font-bold uppercase tracking-widest italic">© 2026 RYAN STORE — Integrated Solution</p>
+        <p class="mt-8 text-[11px] text-slate-400 font-bold uppercase tracking-widest italic">© 2026 RZ COMPANY — Web Builder</p>
     </div>
 
 </body>

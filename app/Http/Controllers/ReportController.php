@@ -9,7 +9,7 @@ use Carbon\Carbon;
 
 class ReportController extends Controller
 {
-    public function index(Request $request)
+ public function index(Request $request)
 {
     // 1. Ambil filter dari URL (default: daily)
     $filter = $request->get('filter', 'daily');
@@ -18,16 +18,14 @@ class ReportController extends Controller
     // 2. Inisialisasi Query
     $revenueQuery = \App\Models\Order::query();
     $expenseQuery = \App\Models\Expense::query();
-    // Tambahan: Query untuk Produk Terjual
     $soldProductsQuery = \App\Models\OrderDetail::query();
 
-    // 3. Logic Filter Waktu
+    // 3. Logic Filter Waktu (Tetap Dipertahankan Sesuai Aslinya)
     if ($filter == 'daily') {
         $today = \Carbon\Carbon::today();
         $revenueQuery->whereDate('created_at', $today);
         $expenseQuery->whereDate('date', $today);
         
-        // Filter untuk produk terjual (lewat relasi order)
         $soldProductsQuery->whereHas('order', function($q) use ($today) {
             $q->whereDate('created_at', $today);
         });
@@ -54,44 +52,53 @@ class ReportController extends Controller
     }
 
     // 4. AMBIL DETAIL DATA
-    $revenueDetails = $revenueQuery->with(['items.product'])->latest()->get();
+    $orders = $revenueQuery->with(['items.product', 'user'])->latest()->get(); 
     $expenseDetails = $expenseQuery->latest()->get();
 
-    // Tambahan: Ambil Rangkuman Produk Terjual (Live Update)
     $soldProducts = $soldProductsQuery->select('product_id', \DB::raw('SUM(quantity) as total_qty'))
-                        ->with('product.category') // Sekalian ambil kategori produknya
+                        ->with('product.category')
                         ->groupBy('product_id')
                         ->orderBy('total_qty', 'desc')
                         ->get();
 
     // 5. Hitung Totalnya
-    $totalRevenue = $revenueQuery->sum('total_price') ?? 0;
-    $totalExpense = $expenseQuery->sum('amount') ?? 0;
-    $grossProfit = $totalRevenue; 
+    $totalRevenue = $orders->sum('total_price');
+    $totalExpense = $expenseDetails->sum('amount');
     $netProfit = $totalRevenue - $totalExpense;
 
+    // --- PERBAIKAN DI SINI: Ditambahkan trim() untuk hapus spasi gaib ---
+    $qrisTotal = $orders->filter(function($order) {
+        // strtoupper + trim agar 'qris', 'QRIS ', 'Qris' semua terdeteksi sama
+        return strtoupper(trim($order->payment_method)) === 'QRIS';
+    })->sum('total_price');
+
+    $cashTotal = $orders->filter(function($order) {
+        return strtoupper(trim($order->payment_method)) === 'CASH';
+    })->sum('total_price');
+
     // 6. Lempar SEMUA data ke Blade
-    return view('reports.index', compact(
-        'totalRevenue', 
-        'totalExpense', 
-        'grossProfit', 
-        'netProfit', 
-        'filter',
-        'revenueDetails',
-        'expenseDetails',
-        'soldProducts' // Jangan lupa variabel baru ini dikirim ke blade
-    ));
+    return view('reports.index', [
+        'orders' => $orders,
+        'totalRevenue' => $totalRevenue, 
+        'totalExpense' => $totalExpense, 
+        'cashTotal' => $cashTotal, 
+        'qrisTotal' => $qrisTotal, 
+        'grossProfit' => $totalRevenue, 
+        'netProfit' => $netProfit, 
+        'filter' => $filter,
+        'revenueDetails' => $orders,
+        'expenseDetails' => $expenseDetails,
+        'soldProducts' => $soldProducts
+    ]);
 }
 
-
-    public function downloadPDF(Request $request) 
+   public function downloadPDF(Request $request) 
 {
     $filter = $request->get('filter', 'daily');
-    $now = Carbon::now();
     $queryRevenue = Order::query();
     $queryExpense = Expense::query();
 
-    // Logic Filter (Sama kayak index biar sinkron)
+    // Logic Filter Tetap Sama (Tidak diubah)
     if ($filter == 'daily') {
         $queryRevenue->whereDate('created_at', today());
         $queryExpense->whereDate('date', today());
@@ -103,13 +110,26 @@ class ReportController extends Controller
         $queryExpense->whereMonth('date', now()->month)->whereYear('date', now()->year);
     }
 
-    // AMBIL DETAIL BUAT DI PDF
-    $revenueDetails = $queryRevenue->with(['items.product'])->latest()->get();
+    // Tambahkan 'user' di eager loading agar nama kasir muncul di PDF tanpa error
+    $revenueDetails = $queryRevenue->with(['items.product', 'user'])->latest()->get();
     $expenseDetails = $queryExpense->latest()->get();
     
-    $totalRevenue = $queryRevenue->sum('total_price') ?? 0;
-    $totalExpense = $queryExpense->sum('amount') ?? 0;
+    $totalRevenue = $revenueDetails->sum('total_price');
+    $totalExpense = $expenseDetails->sum('amount');
     $netProfit = $totalRevenue - $totalExpense;
+
+    // --- HITUNGAN SALDO (QRIS vs CASH) ---
+    // Menggunakan strtoupper untuk antisipasi perbedaan case di database
+    $qrisTotal = $revenueDetails->filter(function($i) {
+        return strtoupper($i->payment_method) === 'QRIS';
+    })->sum('total_price');
+
+    $cashTotal = $revenueDetails->filter(function($i) {
+        return strtoupper($i->payment_method) === 'CASH' || empty($i->payment_method);
+    })->sum('total_price');
+
+    $dateString = now()->translatedFormat('d-F-Y');
+    $fileName = 'Laporan-Ryan-Coffee-' . ucfirst($filter) . '-' . $dateString . '.pdf';
 
     // Kirim semua variabel ke view PDF
     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.pdf', compact(
@@ -118,9 +138,11 @@ class ReportController extends Controller
         'netProfit', 
         'filter',
         'revenueDetails',
-        'expenseDetails'
+        'expenseDetails',
+        'qrisTotal',
+        'cashTotal'
     ));
 
-    return $pdf->download('Laporan-WARUNG-RZ-'.now()->format('d-m-Y').'.pdf');
+    return $pdf->download($fileName);
 }
 }

@@ -58,33 +58,58 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 <span class="text-sm font-medium">Laporan Keuangan</span>
             </a>
+
+            <a href="{{ route('purchases.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition {{ request()->routeIs('purchases.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                <span class="text-sm font-medium">Belanja Barang</span>
+            </a>
         </nav>
 
-        <div class="p-4 border-t border-slate-100 mt-auto">
-            <div class="flex items-center space-x-3 px-2 mb-4">
-                <div class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-[10px] font-bold">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
-                </div>
-                <div class="overflow-hidden">
-                    <p class="text-xs font-bold text-slate-800 truncate">{{ Auth::user()->name }}</p>
-                    <p class="text-[10px] text-slate-500 truncate">{{ Auth::user()->email }}</p>
-                </div>
-            </div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="w-full py-2 border border-slate-200 text-xs font-bold text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-100 rounded-lg transition">
-                    LOGOUT
-                </button>
-            </form>
+        <div class="p-4 border-t border-slate-100">
+    <div class="flex items-center space-x-3 px-2 mb-4">
+        <div class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-[10px] font-bold">
+            {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
         </div>
+        <div class="overflow-hidden">
+            <p class="text-xs font-bold text-slate-800 truncate">{{ Auth::user()->name }}</p>
+            <p class="text-[10px] text-slate-500 truncate">{{ Auth::user()->email }}</p>
+        </div>
+    </div>
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="w-full py-2 border border-slate-200 text-xs font-bold text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-100 rounded-lg transition">
+            LOGOUT
+        </button>
+    </form>
+</div>
     </aside>
 
     {{-- Main Content --}}
     <main class="flex-1 overflow-y-auto">
-        <header class="h-16 flex items-center justify-between px-8 bg-white border-b border-slate-200 sticky top-0 z-10">
-            <h2 class="text-sm font-semibold text-slate-800 italic uppercase">Ringkasan Arus Kas</h2>
-            <div class="text-[11px] font-medium text-slate-500 bg-slate-50 px-3 py-1 rounded-md border border-slate-100">
-                {{ date('l, d M Y') }}
+        <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+            <div>
+                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Ringkas Arus KAS</h2>
+                <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
+            </div>
+
+            <div class="flex items-center space-x-3">              
+                <div class="hidden md:flex flex-col items-end border-r border-slate-200 pr-3">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Hari ini</span>
+                    <span id="realtime-date" class="text-[11px] font-extrabold text-slate-700 uppercase">
+                        {{ date('l, d M Y') }} {{-- Tetap ada buat tampilan awal --}}
+                    </span>
+                </div>
+
+                
+
+                <div class="bg-slate-900 px-4 py-2 rounded-xl shadow-lg shadow-slate-200 flex items-center space-x-2 border border-slate-800">
+                    <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <span id="realtime-clock" class="text-sm font-black text-white tabular-nums tracking-widest">
+                        00:00:00
+                    </span>
+                </div>
             </div>
         </header>
 
@@ -129,7 +154,83 @@
         <p class="text-[10px] font-bold text-slate-900 uppercase">Profit Bersih</p>
         <h3 class="text-2xl font-bold text-slate-900 mt-2">Rp {{ number_format($netProfit, 0, ',', '.') }}</h3>
     </div>
+    
 </div>
+
+{{-- Ringkasan Metode Bayar --}}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+    <div class="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-200">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-lg">💵</div>
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase">Total Cash</p>
+                <p class="text-sm font-black text-slate-900">Rp {{ number_format($cashTotal ?? 0, 0, ',', '.') }}</p>
+            </div>
+        </div>
+        <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Duit Laci</span>
+    </div>
+    <div class="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-200">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-lg">📱</div>
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase">Total QRIS</p>
+                <p class="text-sm font-black text-slate-900">Rp {{ number_format($qrisTotal ?? 0, 0, ',', '.') }}</p>
+            </div>
+        </div>
+        <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">Saldo Digital</span>
+    </div>
+</div>
+
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+    <h3 class="text-lg font-black italic tracking-tighter uppercase mb-4 text-slate-900">Riwayat Transaksi</h3>
+    
+    <table class="w-full text-left">
+        <thead>
+            <tr class="text-[10px] font-bold uppercase text-slate-400 border-b border-slate-100">
+                <th class="pb-3">Waktu</th>
+                <th class="pb-3">Pelanggan</th>
+                <th class="pb-3">Total</th>
+                <th class="pb-3">Kasir (User)</th>
+                <th class="pb-3 text-left text-xs font-bold text-slate-400 uppercase">Metode</th>
+            </tr>
+        </thead>
+        <tbody id="transaction-table" class="divide-y divide-slate-100">
+            @foreach($orders as $index => $order)
+            {{-- Baris ke-6 keatas (index > 4) otomatis disembunyikan dulu --}}
+            <tr class="order-row border-b border-slate-50 last:border-0 {{ $index > 4 ? 'hidden' : '' }}">
+                <td class="py-4 text-sm text-slate-500">{{ $order->created_at->format('H:i') }}</td>
+                <td class="py-4 text-sm font-bold text-slate-900">{{ $order->customer }}</td> 
+                <td class="py-4 text-sm font-black text-slate-900">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
+                <td class="py-4 text-left">
+                    <span class="px-3 py-1 bg-slate-100 text-slate-900 text-[10px] font-bold rounded-full uppercase">
+                        {{ $order->user->name ?? 'System' }}
+                    </span>
+                </td>
+                <td class="py-4 text-left">
+                    <span class="px-2 py-1 rounded text-[10px] font-black uppercase {{ $order->payment_method === 'QRIS' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600' }}">
+                        {{ $order->payment_method }}
+                    </span>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+                    @if(count($orders) > 5)
+        <div class="mt-6 flex justify-center items-center space-x-6">
+            {{-- Tombol Tutup (Hanya muncul kalau yang tampil lebih dari 5) --}}
+            <button id="less-btn" onclick="showLess()" class="hidden text-[10px] font-black uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors border-b-2 border-slate-100 hover:border-red-600 pb-1">
+                ↑ Tutup
+            </button>
+
+            {{-- Tombol Tambah --}}
+            <button id="more-btn" onclick="showMore()" class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors border-b-2 border-slate-100 hover:border-slate-900 pb-1">
+                Lihat Lainnya ↓
+            </button>
+        </div>
+        @endif
+</div>
+
+
 
 {{-- MODAL DETAIL PENDAPATAN --}}
 <div id="modalRevenue" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -289,6 +390,87 @@
         document.getElementById(id).classList.add('hidden');
         document.body.style.overflow = 'auto'; // Aktifin scroll lagi
     }
+    
+    function updateClock() {
+        const now = new Date();
+        
+        // --- Bagian Jam ---
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('realtime-clock').textContent = `${hours}:${minutes}:${seconds}`;
+        
+        // --- Bagian Tanggal (Update otomatis kalau ganti hari) ---
+        const options = { weekday: 'long', year: 'numeric', month: 'short', day: '2-digit' };
+        // Format: Monday, 17 Mar 2026
+        const dateString = now.toLocaleDateString('en-GB', options); 
+        
+        const dateElement = document.getElementById('realtime-date');
+        if (dateElement) {
+            dateElement.textContent = dateString;
+        }
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+
+    let currentShown = 5;
+    const defaultShown = 5;
+    const rowsPerStep = 5;
+
+    function updateButtons() {
+        const rows = document.querySelectorAll('.order-row');
+        const moreBtn = document.getElementById('more-btn');
+        const lessBtn = document.getElementById('less-btn');
+        const totalRows = rows.length;
+
+        // Kontrol Tombol "Lihat Lainnya"
+        if (currentShown >= totalRows) {
+            moreBtn.classList.add('hidden');
+        } else {
+            moreBtn.classList.remove('hidden');
+        }
+
+        // Kontrol Tombol "Tutup" (Muncul cuma kalau baris yang kebuka > 5)
+        if (currentShown > defaultShown) {
+            lessBtn.classList.remove('hidden');
+        } else {
+            lessBtn.classList.add('hidden');
+        }
+    }
+
+    function showMore() {
+        const rows = document.querySelectorAll('.order-row');
+        const totalRows = rows.length;
+        const nextLimit = currentShown + rowsPerStep;
+
+        for (let i = currentShown; i < nextLimit && i < totalRows; i++) {
+            rows[i].classList.remove('hidden');
+        }
+
+        currentShown = nextLimit;
+        updateButtons();
+    }
+
+    function showLess() {
+        const rows = document.querySelectorAll('.order-row');
+        
+        // Kita kurangi jumlah yang tampil sebanyak 5
+        const prevLimit = currentShown - rowsPerStep;
+        
+        // Sembunyikan baris dari batas baru sampai yang tadinya tampil
+        rows.forEach((row, index) => {
+            if (index >= prevLimit && index >= defaultShown) {
+                row.classList.add('hidden');
+            }
+        });
+
+        // Pastikan nggak kurang dari 5
+        currentShown = prevLimit < defaultShown ? defaultShown : prevLimit;
+        updateButtons();
+    }
+
 </script>
 
 </body>

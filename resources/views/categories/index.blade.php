@@ -55,19 +55,56 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 <span class="text-sm font-medium">Laporan Keuangan</span>
             </a>
-        </nav>
 
-        <div class="p-4 border-t border-slate-100">
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="w-full py-2 border border-slate-200 text-xs font-bold text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition uppercase">Logout</button>
-            </form>
+            <a href="{{ route('purchases.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition {{ request()->routeIs('purchases.*') ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                <span class="text-sm font-medium">Belanja Barang</span>
+            </a>
+        </nav>
+<div class="p-4 border-t border-slate-100">
+    <div class="flex items-center space-x-3 px-2 mb-4">
+        <div class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-[10px] font-bold">
+            {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
         </div>
+        <div class="overflow-hidden">
+            <p class="text-xs font-bold text-slate-800 truncate">{{ Auth::user()->name }}</p>
+            <p class="text-[10px] text-slate-500 truncate">{{ Auth::user()->email }}</p>
+        </div>
+    </div>
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="w-full py-2 border border-slate-200 text-xs font-bold text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-100 rounded-lg transition">
+            LOGOUT
+        </button>
+    </form>
+</div>
+        
     </aside>
 
     <main class="flex-1 overflow-y-auto">
-        <header class="h-16 flex items-center justify-between px-8 bg-white border-b border-slate-200 sticky top-0 z-10">
-            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-widest">Kategori Produk</h2>
+        <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+            <div>
+                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">kategori produk</h2>
+                <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
+            </div>
+
+            <div class="flex items-center space-x-3">              
+                <div class="hidden md:flex flex-col items-end border-r border-slate-200 pr-3">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Hari ini</span>
+                    <span id="realtime-date" class="text-[11px] font-extrabold text-slate-700 uppercase">
+                        {{ date('l, d M Y') }} {{-- Tetap ada buat tampilan awal --}}
+                    </span>
+                </div>
+
+                <div class="bg-slate-900 px-4 py-2 rounded-xl shadow-lg shadow-slate-200 flex items-center space-x-2 border border-slate-800">
+                    <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <span id="realtime-clock" class="text-sm font-black text-white tabular-nums tracking-widest">
+                        00:00:00
+                    </span>
+                </div>
+            </div>
         </header>
 
         <div class="p-8">
@@ -82,7 +119,7 @@
                     @csrf
                     <div class="flex-1">
                         <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Nama Kategori Baru</label>
-                        <input type="text" name="name" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-slate-900 transition" placeholder="Masukkan nama kategori...">
+                        <input type="text" name="name" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-slate-900 transition" >
                     </div>
                     <button type="submit" class="bg-slate-900 text-white px-6 py-2.5 rounded-xl text-xs font-bold hover:bg-black transition shadow-sm uppercase">
                         + Tambah Kategori
@@ -103,8 +140,11 @@
                         @forelse ($categories as $category)
                         <tr class="hover:bg-slate-50 transition-colors">
                             <td class="px-6 py-4">
-                                <p class="text-sm font-bold text-slate-800 uppercase italic tracking-tight">{{ $category->name }}</p>
-                                <p class="text-[10px] text-slate-400">Slug: {{ $category->slug }}</p>
+                                {{-- PERUBAHAN: Sekarang bisa diklik untuk buka Modal Produk --}}
+                                <button type="button" onclick="openCategoryModal({{ $category->id }}, '{{ $category->name }}')" class="text-left outline-none group">
+                                    <p class="text-sm font-bold text-slate-800 uppercase italic tracking-tight group-hover:text-blue-600 transition-colors">{{ $category->name }}</p>
+                                    <p class="text-[10px] text-slate-400">Slug: {{ $category->slug }} (Klik untuk detail)</p>
+                                </button>
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <span class="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-full">
@@ -132,5 +172,105 @@
         </div>
     </main>
 </div>
+
+{{-- PENAMBAHAN: Modal List Produk (Style Cart) --}}
+<div id="category-modal" class="fixed inset-0 z-[100] hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-200">
+            <div class="bg-white px-6 py-6 border-b border-slate-100 flex justify-between items-center">
+                <div>
+                    <h3 id="modal-title" class="text-sm font-black text-slate-900 uppercase tracking-widest">NAMA KATEGORI</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Daftar Produk Terkait</p>
+                </div>
+                <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-900 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-content" class="px-6 py-4 max-h-[400px] overflow-y-auto space-y-3">
+                <div class="flex justify-center py-10">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
+                </div>
+            </div>
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-100">
+                <button onclick="closeCategoryModal()" class="w-full bg-slate-900 text-white px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-slate-200">
+                    Tutup Detail
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        
+        // --- Bagian Jam ---
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('realtime-clock').textContent = `${hours}:${minutes}:${seconds}`;
+        
+        // --- Bagian Tanggal (Update otomatis kalau ganti hari) ---
+        const options = { weekday: 'long', year: 'numeric', month: 'short', day: '2-digit' };
+        // Format: Monday, 17 Mar 2026
+        const dateString = now.toLocaleDateString('en-GB', options); 
+        
+        const dateElement = document.getElementById('realtime-date');
+        if (dateElement) {
+            dateElement.textContent = dateString;
+        }
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // PENAMBAHAN: Fungsi JavaScript untuk Modal List Produk
+    function openCategoryModal(categoryId, categoryName) {
+        const modal = document.getElementById('category-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalContent = document.getElementById('modal-content');
+
+        modal.classList.remove('hidden');
+        modalTitle.textContent = categoryName;
+        modalContent.innerHTML = `<div class="flex justify-center py-10"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div></div>`;
+
+        // Fetch data produk dari route API (Pastikan route /api/categories/{id}/products sudah ada)
+        fetch(`/api/categories/${categoryId}/products`)
+            .then(response => response.json())
+            .then(products => {
+                if (products.length === 0) {
+                    modalContent.innerHTML = `<p class="text-center text-slate-400 text-xs py-10 italic">Tidak ada produk dalam kategori ini.</p>`;
+                    return;
+                }
+
+                let html = '';
+                products.forEach(product => {
+                    html += `
+                    <div class="flex items-center p-3 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-300 transition-all">
+                        <div class="w-12 h-12 bg-white rounded-xl border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                            ${product.image ? `<img src="/storage/${product.image}" class="w-full h-full object-cover">` : `<svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`}
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <p class="text-[11px] font-black text-slate-800 uppercase leading-none">${product.name}</p>
+                            <p class="text-[10px] text-emerald-600 font-bold mt-1">Rp ${new Intl.NumberFormat('id-ID').format(product.price)}</p>
+                        </div>
+                    </div>`;
+                });
+                modalContent.innerHTML = html;
+            })
+            .catch(error => {
+                modalContent.innerHTML = `<p class="text-center text-red-400 text-[10px] py-10 italic uppercase font-bold">Gagal memuat data produk.</p>`;
+            });
+    }
+
+    function closeCategoryModal() {
+        document.getElementById('category-modal').classList.add('hidden');
+    }
+</script>
 </body>
 </html>
