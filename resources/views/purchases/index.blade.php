@@ -115,6 +115,8 @@
             </div>
         </header>
 
+        
+
             <div class="p-8 space-y-8">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     
@@ -226,10 +228,15 @@
     <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest">Barang Belanja</h3>
     
     {{-- Tambahkan Tombol ini bang --}}
-    <a href="{{ route('purchases.pdf') }}" class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg transition text-[10px] font-bold uppercase tracking-wider">
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-        <span>Download PDF</span>
-    </a>
+<a href="{{ route('purchases.pdf', request()->all()) }}" 
+   class="flex items-center space-x-2 bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white px-3 py-1.5 rounded-lg transition-all duration-200 text-[10px] font-bold uppercase tracking-wider border border-rose-200 hover:border-rose-500 shadow-sm">
+    
+    <svg class="w-3 h-3 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+    </svg>
+    
+    <span>Download PDF</span>
+</a>
 </div>
 
                 </div>

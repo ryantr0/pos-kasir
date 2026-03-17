@@ -151,9 +151,9 @@
     {{-- Tabel Transaksi (Kiri) --}}
     <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-            <h3 class="text-sm font-bold text-slate-800 italic uppercase">Transaksi Terbaru</h3>
-            <a href="{{ route('reports.index') }}" class="text-[10px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-wider transition">Lihat Semua →</a>
-        </div>
+                <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">Transaksi Terbaru</h3>               
+                <a href="{{ route('reports.index') }}" class="text-[10px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-wider transition">Lihat Semua →</a>
+            </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
@@ -187,94 +187,197 @@
         </div>
     </div>
 
-    {{-- Diagram Tren Pendapatan (Kanan) --}}
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col">
-        <div class="mb-4">
-            <h3 class="text-sm font-bold text-slate-800 italic uppercase">Tren Penjualan</h3>
-            <p class="text-[10px] text-slate-400 font-medium">Statistik 7 hari terakhir</p>
+{{-- Diagram Tren Pendapatan (Pro Version) --}}
+<div class="lg:col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col hover:shadow-xl hover:border-emerald-100 transition-all duration-500 group">
+    <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                {{-- Diubah dari text-xl ke text-sm, dan font-bold ke font-black biar tetap tegas walau kecil --}}
+                <h3 class="text-xs font-black text-slate-800 tracking-wider uppercase">STATISTIK PENJUALAN</h3>
+            </div>
         </div>
-        <div class="flex-1 min-h-[250px]">
-            <canvas id="salesChart"></canvas>
-        </div>
+
+        {{-- Filter Tanggal Mini --}}
+        <form action="{{ route('dashboard') }}" method="GET" class="flex items-center bg-slate-50 border border-slate-200 p-1 rounded-xl gap-2">
+            <div class="flex items-center space-x-1 px-1">
+                <input type="date" name="start_date" value="{{ $start }}" 
+                    class="w-24 text-[9px] font-bold border-none focus:ring-0 text-slate-600 bg-transparent p-0 transition-all">
+                <span class="text-slate-300 text-[10px]">—</span>
+                <input type="date" name="end_date" value="{{ $end }}" 
+                    class="w-24 text-[9px] font-bold border-none focus:ring-0 text-slate-600 bg-transparent p-0 transition-all">
+            </div>
+            <button type="submit" class="bg-slate-900 text-white p-1.5 rounded-lg hover:bg-emerald-600 transition-colors">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    {{-- INI YANG PENTING: Tempat Grafiknya --}}
+    <div class="relative h-64 w-full">
+        <canvas id="salesChart"></canvas>
     </div>
 </div>
 
 {{-- Load Chart.js dari CDN --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const ctx = document.getElementById('salesChart').getContext('2d');
-    
-    const labels = {!! json_encode($salesData->pluck('date')->map(fn($d) => date('d M', strtotime($d)))) !!};
-    const dataValues = {!! json_encode($salesData->pluck('total')) !!};
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Pendapatan',
-                data: dataValues,
-                borderColor: '#0f172a', // Slate-900
-                backgroundColor: 'rgba(15, 23, 42, 0.05)',
-                borderWidth: 3,
-                tension: 0.4, // Bikin garis melengkung estetik
-                pointRadius: 4,
-                pointBackgroundColor: '#fff',
-                pointBorderColor: '#0f172a',
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { display: false }, // Sembunyikan garis Y biar clean
-                x: {
-                    grid: { display: false },
-                    ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8' }
-                }
-            }
-        }
-    });
-</script>
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100">
+        <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">Produk Terlaris</h3>
+    </div>
 
-                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-                    <h3 class="text-sm font-bold text-slate-800 mb-6">Produk Terlaris</h3>
-                    <div class="space-y-4">
-                        @forelse($produkTerlaris as $item)
-                        <div class="flex items-center justify-between p-3 rounded-lg border border-slate-50 bg-slate-50/50">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 rounded bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400">#</div>
-                                <div>
-                                    <p class="text-xs font-bold text-slate-800 uppercase">{{ $item->name }}</p>
-                                    <p class="text-[10px] text-slate-500">{{ $item->sold }} terjual</p>
-                                </div>
-                            </div>
-                        </div>
-                        @empty
-                        <div class="py-10 text-center text-slate-400 text-xs italic">Data penjualan kosong.</div>
-                        @endforelse
-                    </div>
+    <div class="p-6 space-y-4">
+        @forelse($produkTerlaris as $item)
+        <div class="flex items-center justify-between p-3 rounded-lg border border-slate-50 bg-slate-50/50">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400">#</div>
+                <div>
+                    {{-- Nama produk juga kita bikin tegas --}}
+                    <p class="text-xs font-bold text-slate-800 uppercase">{{ $item->name }}</p>
+                    <p class="text-[10px] text-slate-500 font-medium">{{ $item->sold }} TERJUAL</p>
                 </div>
             </div>
         </div>
-    </main>
+        @empty
+        <div class="py-10 text-center text-slate-400 text-xs italic">Data penjualan kosong.</div>
+        @endforelse
+    </div>
 </div>
 
+
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- 1. LOGIKA GRAFIK (SAGE GREEN THEME) ---
+    const canvas = document.getElementById('salesChart');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+
+        // Data dari Laravel
+        const labels = {!! json_encode($salesData->pluck('date')->map(fn($d) => date('d M', strtotime($d)))) !!};
+        const dataValues = {!! json_encode($salesData->pluck('total')) !!};
+
+        // Konfigurasi Warna
+        const colorPrimary = '#a3b18a'; 
+        const colorHover = '#3a5a40';   
+        const colorGrid = '#f1f5f9';    
+        const colorText = '#94a3b8';    
+        const colorTooltipBg = '#1e293b'; 
+
+        // Gradient Fill
+        const gradientFill = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientFill.addColorStop(0, 'rgba(163, 177, 138, 0.4)'); 
+        gradientFill.addColorStop(0.6, 'rgba(163, 177, 138, 0.1)'); 
+        gradientFill.addColorStop(1, 'rgba(255, 255, 255, 0)');     
+
+        // Shadow Effect
+        ctx.shadowColor = 'rgba(163, 177, 138, 0.3)';
+        ctx.shadowBlur = 12;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 8;
+
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Revenue',
+                    data: dataValues,
+                    fill: true,
+                    backgroundColor: gradientFill,
+                    borderColor: colorPrimary,
+                    borderWidth: 3.5,
+                    tension: 0.42,
+                    pointRadius: 0,
+                    pointHoverRadius: 7,
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: colorHover,
+                    pointHoverBorderWidth: 3,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: { left: 10, right: 10, top: 20, bottom: 10 }
+                },
+                animation: {
+                    duration: 2500,
+                    easing: 'easeOutQuart'
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: colorTooltipBg,
+                        titleFont: { size: 13, weight: 'bold' },
+                        bodyFont: { size: 13 },
+                        padding: 16,
+                        cornerRadius: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = ' Total: ';
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('id-ID', { 
+                                        style: 'currency', 
+                                        currency: 'IDR',
+                                        maximumFractionDigits: 0 
+                                    }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        display: false,
+                    },
+                    x: {
+                        grid: {
+                            display: true,
+                            color: colorGrid,
+                            drawBorder: false,
+                            lineWidth: 0.5
+                        },
+                        ticks: {
+                            color: colorText,
+                            font: { size: 10, weight: '600' },
+                            padding: 12,
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 7
+                        }
+                    }
+                }
+            }
+        }); // <-- Tadi kurang kurung penutup di sini
+    }
+
+    // --- 2. FUNGSI JAM REAL-TIME (TETAP TERJAGA) ---
     function updateClock() {
         const now = new Date();
         
-        // --- Bagian Jam ---
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const seconds = String(now.getSeconds()).padStart(2, '0');
-        document.getElementById('realtime-clock').textContent = `${hours}:${minutes}:${seconds}`;
         
-        // --- Bagian Tanggal (Update otomatis kalau ganti hari) ---
+        const clockElement = document.getElementById('realtime-clock');
+        if (clockElement) {
+            clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+        }
+        
         const options = { weekday: 'long', year: 'numeric', month: 'short', day: '2-digit' };
-        // Format: Monday, 17 Mar 2026
         const dateString = now.toLocaleDateString('en-GB', options); 
         
         const dateElement = document.getElementById('realtime-date');
@@ -285,6 +388,7 @@
 
     setInterval(updateClock, 1000);
     updateClock();
+});
 </script>
 
 </body>

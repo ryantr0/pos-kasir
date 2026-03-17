@@ -88,9 +88,20 @@
                 <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
             </div>
 
-            <a href="{{ route('products.create') }}" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-black transition shadow-sm">
-                + TAMBAH PRODUK BARU
-            </a>
+            {{-- SEARCH BAR BARU --}}
+    <div class="flex-1 max-w-md mx-8">
+        <div class="relative group">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                <svg class="w-4 h-4 text-slate-400 group-focus-within:text-slate-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </span>
+            <input type="text" id="productSearch" placeholder="Cari nama produk atau kategori..." 
+                class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium outline-none focus:border-slate-900 focus:bg-white transition-all">
+        </div>
+    </div>
+
+
 
             <div class="flex items-center space-x-3">              
                 <div class="hidden md:flex flex-col items-end border-r border-slate-200 pr-3">
@@ -110,6 +121,19 @@
         
             
         </header>
+
+         <div class="p-8">
+    {{-- AREA BARU UNTUK TOMBOL DI LUAR HEADER --}}
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <p class="text-lg font-black text-slate-800 tracking-tight uppercase">Total Produk: {{ $products->count() }}</p>
+        </div>
+        
+        <a href="{{ route('products.create') }}" class="bg-slate-900 text-white px-6 py-3 rounded-xl text-xs font-bold hover:bg-black transition shadow-lg shadow-slate-200 flex items-center space-x-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <span>TAMBAH PRODUK BARU</span>
+        </a>
+    </div>
 
         <div class="p-8">
             @if(session('success'))
@@ -199,6 +223,48 @@
 
     setInterval(updateClock, 1000);
     updateClock();
+
+    // Fungsi Pencarian Produk
+    const searchInput = document.getElementById('productSearch');
+    
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function(e) {
+            // Cegah refresh halaman jika tekan Enter
+            if (e.key === 'Enter') e.preventDefault();
+
+            let filter = this.value.toLowerCase().trim();
+            let rows = document.querySelectorAll('tbody tr:not(#searchEmptyMsg)');
+            let hasResults = false;
+
+            rows.forEach(row => {
+                // Ambil text dari kolom Info Produk (Nama) dan kolom Kategori
+                let productName = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                let categoryName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+                if (productName.includes(filter) || categoryName.includes(filter)) {
+                    row.style.display = ""; // Munculkan
+                    hasResults = true;
+                } else {
+                    row.style.display = "none"; // Sembunyikan
+                }
+            });
+
+            // Logika Pesan Kosong
+            let tableBody = document.querySelector('tbody');
+            let emptyMsg = document.getElementById('searchEmptyMsg');
+            
+            if (!hasResults && filter !== "") {
+                if (!emptyMsg) {
+                    let tr = document.createElement('tr');
+                    tr.id = 'searchEmptyMsg';
+                    tr.innerHTML = `<td colspan="4" class="py-20 text-center text-slate-400 text-xs italic uppercase font-bold tracking-widest">Barang "${filter}" nggak ketemu, Bang...</td>`;
+                    tableBody.appendChild(tr);
+                }
+            } else {
+                if (emptyMsg) emptyMsg.remove();
+            }
+        });
+    }
 </script>
 </body>
 </html>

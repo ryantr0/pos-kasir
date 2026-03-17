@@ -19,11 +19,22 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1 style="margin:0; letter-spacing: 3px; color: #1e293b;">WARUNG RZ</h1>
-        <p style="margin:5px 0; font-weight: bold; color: #64748b;">LAPORAN KEUANGAN PERIODE: {{ strtoupper($filter) }}</p>
-        <small>Waktu Cetak: {{ now()->translatedFormat('d F Y | H:i:s') }} WIB</small>
-    </div>
+   <div class="header">
+    <h1 style="margin:0; letter-spacing: 3px; color: #1e293b;">WARUNG RZ</h1>
+    
+    <p style="margin:5px 0; font-weight: bold; color: #64748b;">
+        LAPORAN KEUANGAN PERIODE: 
+        @if(request('start_date') && request('end_date'))
+            {{ \Carbon\Carbon::parse(request('start_date'))->translatedFormat('d F Y') }} 
+            S/D 
+            {{ \Carbon\Carbon::parse(request('end_date'))->translatedFormat('d F Y') }}
+        @else
+            {{ strtoupper($filter) }}
+        @endif
+    </p>
+    
+    <small>Waktu Cetak: {{ now()->translatedFormat('d F Y | H:i:s') }} WIB</small>
+</div>
 
     <div class="summary-box">
         <table style="border: none; width: 100%; margin-bottom: 0; background: transparent;">

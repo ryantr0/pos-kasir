@@ -130,43 +130,73 @@
                 </div>
 
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-                    @forelse($products as $p)
-                    <div class="product-card bg-white rounded-lg border border-slate-200 overflow-hidden flex flex-col hover:border-slate-900 transition-all shadow-sm h-full"
-                         data-name="{{ strtolower($p->name) }}" 
-                         data-category="{{ $p->category->name ?? '' }}">
-                        
-                        <div class="aspect-square bg-slate-50 relative overflow-hidden border-b border-slate-100">
-                            @if($p->image)
-                                <img src="{{ asset('storage/' . $p->image) }}" class="w-full h-full object-cover">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center text-slate-300 font-bold text-xs uppercase">
-                                    {{ substr($p->name, 0, 2) }}
-                                </div>
-                            @endif
-                        </div>
+                   @forelse($products as $p)
+    <div class="product-card group relative bg-white rounded-lg border {{ !$p->is_ready ? 'border-slate-100 opacity-75' : 'border-slate-200 hover:border-slate-900' }} overflow-hidden flex flex-col transition-all shadow-sm h-full"
+         data-name="{{ strtolower($p->name) }}" 
+         data-category="{{ $p->category->name ?? '' }}">
+        
+        {{-- Overlay Barang Habis --}}
+        @if(!$p->is_ready)
+            <div class="absolute inset-0 z-20 flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
+                <span class="bg-rose-500 text-white text-[9px] font-black px-2.5 py-1 rounded-full shadow-xl uppercase tracking-widest rotate-12 border-2 border-white">
+                    Stok Habis
+                </span>
+            </div>
+        @endif
 
-                        <div class="p-2 flex-1 flex flex-col">
-                            <h4 class="text-[10px] font-bold text-slate-800 uppercase truncate mb-0.5" title="{{ $p->name }}">
-                                {{ $p->name }}
-                            </h4>
-                            <p class="text-[11px] font-black text-slate-900 mb-2">
-                                Rp {{ number_format($p->price, 0, ',', '.') }}
-                            </p>
+        {{-- Image Section --}}
+        <div class="aspect-square bg-slate-50 relative overflow-hidden border-b border-slate-100 {{ !$p->is_ready ? 'grayscale' : '' }}">
+            @if($p->image)
+                <img src="{{ asset('storage/' . $p->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            @else
+                <div class="w-full h-full flex items-center justify-center text-slate-300 font-bold text-xs uppercase">
+                    {{ substr($p->name, 0, 2) }}
+                </div>
+            @endif
+        </div>
 
-                            <button @click="addToCart({{ $p->id }}, '{{ $p->name }}', {{ $p->price }})" 
-                                    class="mt-auto w-full py-1.5 bg-slate-900 text-white rounded-md text-[9px] font-bold uppercase tracking-wider hover:bg-slate-800 transition-colors active:scale-95 flex items-center justify-center space-x-1">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                <span>Add</span>
-                            </button>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="col-span-full py-10 text-center text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">
-                        Kosong
-                    </div>
-                    @endforelse
+        {{-- Content Section --}}
+        <div class="p-2 flex-1 flex flex-col {{ !$p->is_ready ? 'grayscale' : '' }}">
+            <h4 class="text-[10px] font-bold text-slate-800 uppercase truncate mb-0.5" title="{{ $p->name }}">
+                {{ $p->name }}
+            </h4>
+            <p class="text-[11px] font-black text-slate-900 mb-2">
+                Rp {{ number_format($p->price, 0, ',', '.') }}
+            </p>
+
+            {{-- Tombol Add dengan Proteksi --}}
+            <button 
+                @click="addToCart({{ $p->id }}, '{{ $p->name }}', {{ $p->price }}, {{ $p->is_ready ? 'true' : 'false' }})" 
+                class="mt-auto w-full py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider transition-all flex items-center justify-center space-x-1
+                {{ $p->is_ready 
+                    ? 'bg-slate-900 text-white hover:bg-emerald-600 active:scale-95' 
+                    : 'bg-slate-200 text-slate-400 cursor-not-allowed' }}"
+                {{ !$p->is_ready ? 'disabled' : '' }}>
+                
+                @if($p->is_ready)
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span>Add to Cart</span>
+                @else
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                    </svg>
+                    <span>Unavailable</span>
+                @endif
+            </button>
+        </div>
+    </div>
+@empty
+    <div class="col-span-full py-20 text-center">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-50 mb-3">
+            <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+            </svg>
+        </div>
+        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">Belum Ada Produk di Kategori Ini</p>
+    </div>
+@endforelse
                 </div>
             </div>
         </main>
@@ -328,9 +358,25 @@
             changeAmount: 0,
             showQrisModal: false,
 
-            addToCart(id, name, price) {
+            // TAMBAHAN: Pengecekan isReady di sini agar sinkron dengan toggle "Barang Habis"
+            addToCart(id, name, price, isReady = true) {
+                // Cek jika status barang tidak tersedia (0 atau false)
+                if (!isReady || isReady == 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Waduh!',
+                        text: 'Stok ' + name + ' lagi kosong, Bang!',
+                        confirmButtonColor: '#10b981'
+                    });
+                    return;
+                }
+
                 let found = this.cart.find(i => i.id === id);
-                if (found) { found.qty++; } else { this.cart.push({ id, name, price, qty: 1 }); }
+                if (found) { 
+                    found.qty++; 
+                } else { 
+                    this.cart.push({ id, name, price, qty: 1 }); 
+                }
                 this.updateTotals();
             },
 
@@ -354,8 +400,14 @@
 
             async checkout() {
                 const customerName = document.getElementById('customer_name').value;
-                if (!customerName) { alert('Tolong isi nama pelanggan dulu, Bang!'); return; }
-                if (this.cart.length === 0) { alert('Keranjang masih kosong!'); return; }
+                if (!customerName) { 
+                    alert('Tolong isi nama pelanggan dulu, Bang!'); 
+                    return; 
+                }
+                if (this.cart.length === 0) { 
+                    alert('Keranjang masih kosong!'); 
+                    return; 
+                }
 
                 if (this.paymentMethod === 'CASH' && this.cashAmount < this.totalPrice) {
                     alert('Uang tunai kurang, Bang!');

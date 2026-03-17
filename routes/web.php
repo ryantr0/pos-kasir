@@ -1,42 +1,62 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
-use Illuminate\Support\Facades\Route;
-use App\Models\Product;
-use App\Models\Category;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\PurchaseController;
+use App\Models\Product;
 
-// Redirect ke login jika belum ada session, atau ke dashboard jika sudah login
+// 1. Landing Page
 Route::get('/', function () {
     return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
-    
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
+// 2. Group Middleware Auth (Semua route di dalam sini aman)
+Route::middleware(['auth'])->group(function () {
 
-    // DASHBOARD - Data Asli buat Statistik & Diagram
-    Route::get('/dashboard', function () {
-        $salesData = \App\Models\Order::selectRaw('DATE(created_at) as date, SUM(total_price) as total')
-            ->where('created_at', '>=', now()->subDays(6))
+    // DASHBOARD - Logic Fill Gaps Rp 0
+    Route::get('/dashboard', function (Request $request) {
+        $start = $request->get('start_date', now()->subDays(6)->format('Y-m-d'));
+        $end = $request->get('end_date', now()->format('Y-m-d'));
+
+        // Ambil data asli dari DB
+        $rawSales = \App\Models\Order::selectRaw('DATE(created_at) as date, SUM(total_price) as total')
+            ->whereBetween('created_at', [$start . ' 00:00:00', $end . ' 23:59:59'])
             ->groupBy('date')
-            ->orderBy('date', 'ASC')
-            ->get();
+            ->pluck('total', 'date');
+
+        // Logika Fill Gaps (Agar tanggal kosong muncul Rp 0)
+        $salesData = collect();
+        $period = new DatePeriod(
+            new DateTime($start),
+            new DateInterval('P1D'),
+            (new DateTime($end))->modify('+1 day')
+        );
+
+        foreach ($period as $date) {
+            $formattedDate = $date->format('Y-m-d');
+            $salesData->push([
+                'date'  => $formattedDate,
+                'total' => $rawSales[$formattedDate] ?? 0 
+            ]);
+        }
 
         return view('dashboard', [
-            'totalProduk'      => \App\Models\Product::count(),
-            'totalKategori'    => \App\Models\Category::count(),
+            'totalProduk'       => \App\Models\Product::count(),
+            'totalKategori'     => \App\Models\Category::count(),
             'pendapatanHariIni' => \App\Models\Order::whereDate('created_at', today())->sum('total_price') ?? 0,
-            'transaksiHariIni' => \App\Models\Order::whereDate('created_at', today())->count(),
-            'transaksiTerbaru' => \App\Models\Order::latest()->take(5)->get(),
-            'salesData'        => $salesData,
-            'produkTerlaris'   => \App\Models\Product::orderBy('sold', 'desc')->take(3)->get(),
+            'transaksiHariIni'  => \App\Models\Order::whereDate('created_at', today())->count(),
+            'transaksiTerbaru'  => \App\Models\Order::latest()->take(5)->get(),
+            'salesData'         => $salesData,
+            'produkTerlaris'    => \App\Models\Product::orderBy('sold', 'desc')->take(3)->get(),
+            'start'             => $start, 
+            'end'               => $end,
         ]);
     })->name('dashboard');
 
@@ -47,6 +67,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // MANAJEMEN DATA (Produk & Kategori)
     Route::resource('products', ProductController::class);
     Route::resource('categories', CategoryController::class);
+    
 
     // LAPORAN & PENGELUARAN
     Route::get('/laporan', [ReportController::class, 'index'])->name('reports.index');

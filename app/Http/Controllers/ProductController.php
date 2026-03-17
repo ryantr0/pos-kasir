@@ -62,36 +62,44 @@ class ProductController extends Controller
         return view('products.edit', compact('product', 'categories'));
     }
 
-    public function update(Request $request, Product $product)
-    {
-        // Ubah 'category' menjadi 'category_id'
-        $validatedData = $request->validate([
-            'name'        => 'required|string|max:255',
-            'price'       => 'required|numeric',
-            'category_id' => 'required|exists:categories,id', 
-            'description' => 'nullable|string',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
+ public function update(Request $request, Product $product)
+{
+    // 1. Validasi data (is_ready kita buat nullable karena checkbox sering tidak terkirim kalau off)
+    $validatedData = $request->validate([
+        'name'        => 'required|string|max:255',
+        'price'       => 'required|numeric',
+        'category_id' => 'required|exists:categories,id', 
+        'description' => 'nullable|string',
+        'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        'is_ready'    => 'nullable' // Tambahkan ini agar lolos validasi
+    ]);
 
-        if ($request->hasFile('image')) {
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-            $validatedData['image'] = $request->file('image')->store('products', 'public');
-        }
-
-        $product->update($validatedData);
-
-        return redirect()->route('products.index')->with('success', 'PRODUK BERHASIL DIUPDATE!');
-    }
-
-    public function destroy(Product $product)
-    {
+    // 2. Logika hapus & simpan gambar (Sudah benar, tidak saya ubah)
+    if ($request->hasFile('image')) {
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
         }
-
-        $product->delete();
-        return redirect()->route('products.index')->with('success', 'PRODUK BERHASIL DIHAPUS!');
+        $validatedData['image'] = $request->file('image')->store('products', 'public');
     }
+
+    // 3. LOGIKA KUNCI: Menentukan is_ready (True/False)
+    // Jika checkbox dicentang, nilainya true. Jika tidak ada di request, nilainya false.
+    $validatedData['is_ready'] = $request->has('is_ready');
+
+    // 4. Update semua data termasuk is_ready
+    $product->update($validatedData);
+
+    return redirect()->route('products.index')->with('success', 'PRODUK BERHASIL DIUPDATE!');
+}
+
+public function destroy(Product $product)
+{
+    // Logika hapus (Sudah benar, tidak saya ubah)
+    if ($product->image) {
+        Storage::disk('public')->delete($product->image);
+    }
+
+    $product->delete();
+    return redirect()->route('products.index')->with('success', 'PRODUK BERHASIL DIHAPUS!');
+}
 }

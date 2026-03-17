@@ -113,23 +113,97 @@
             </div>
         </header>
 
-        <div class="p-8 space-y-8">
-            {{-- Filter Area --}}
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-2xl font-bold text-slate-900 tracking-tight uppercase italic">Periode: {{ $filter }}</h3>
-                    <p class="text-xs text-slate-400 mt-1">Pantau performa keuangan Warung RZ secara real-time.</p>
+        <div class="p-4 space-y-5">
+{{-- Container Utama: Menggunakan items-center agar semua elemen sejajar tingginya --}}
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+    
+    {{-- Sisi Kiri: Info Periode --}}
+<div class="flex-shrink-0">
+    <h3 class="text-[14px] font-black text-slate-900 tracking-wide uppercase not-italic">
+        <span class="text-slate-400">Periode:</span> 
+        
+        @if(request('start_date') && request('end_date'))
+            {{-- Jika User Pilih Tanggal Custom --}}
+            <span class="text-emerald-600">{{ \Carbon\Carbon::parse(request('start_date'))->translatedFormat('d F Y') }}</span> 
+            
+            @if(request('start_date') !== request('end_date'))
+                <span class="text-slate-300 mx-1">s/d</span>
+                <span class="text-emerald-600">{{ \Carbon\Carbon::parse(request('end_date'))->translatedFormat('d F Y') }}</span>
+            @endif
+        @else
+            {{-- Jika filter bawaan (Daily/Weekly/Monthly) --}}
+            <span class="text-emerald-600">
+                @if(strtolower($filter) == 'daily')
+                    HARI INI
+                @elseif(strtolower($filter) == 'weekly')
+                    MINGGU INI
+                @elseif(strtolower($filter) == 'monthly')
+                    BULAN INI
+                @else
+                    {{ strtoupper($filter) }}
+                @endif
+            </span>
+        @endif
+    </h3>
+</div>
+
+    {{-- Sisi Kanan: Gabungan Form Filter dan Tombol Cetak --}}
+    <div class="flex flex-wrap items-center gap-3">
+        
+        {{-- Form Filter --}}
+        <form action="{{ route('reports.index') }}" method="GET" class="flex items-center bg-white border border-slate-200 p-1.5 rounded-xl shadow-sm gap-2">
+            <div class="flex items-end space-x-2 px-1">
+                {{-- Input Dari --}}
+                <div class="flex flex-col items-center">
+                    <label class="text-[8px] font-black text-slate-400 uppercase tracking-tighter mb-0.5">Dari</label>
+                    <input type="date" name="start_date" value="{{ request('start_date', date('Y-m-d')) }}" 
+                        class="w-28 text-[10px] font-bold border-none focus:ring-0 text-slate-700 uppercase bg-slate-50 rounded-md px-2 py-1 transition-all text-center">
                 </div>
-                
-                <form action="{{ route('reports.index') }}" method="GET" class="flex items-center bg-white border border-slate-200 p-1 rounded-lg shadow-sm">
-                    @foreach(['daily' => 'Harian', 'weekly' => 'Mingguan', 'monthly' => 'Bulanan'] as $key => $label)
-                        <button type="submit" name="filter" value="{{ $key }}" 
-                            class="px-4 py-1.5 text-[10px] font-bold rounded-md transition {{ $filter == $key ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-900' }}">
-                            {{ strtoupper($label) }}
-                        </button>
-                    @endforeach
-                </form>
+
+                {{-- Tanda Pisah --}}
+                <div class="flex items-center pb-1.5">
+                    <span class="text-slate-300 font-bold text-[10px]">—</span>
+                </div>
+
+                {{-- Input Sampai --}}
+                <div class="flex flex-col items-center">
+                    <label class="text-[8px] font-black text-slate-500 uppercase tracking-tighter mb-0.5">Sampai</label>
+                    <input type="date" name="end_date" value="{{ request('end_date', date('Y-m-d')) }}" 
+                        class="w-28 text-[10px] font-bold border-none focus:ring-0 text-slate-700 uppercase bg-slate-50 rounded-md px-2 py-1 transition-all text-center">
+                </div>
             </div>
+            
+            {{-- Tombol Cari --}}
+            <button type="submit" class="group bg-transparent text-slate-400 hover:text-white hover:bg-slate-900 px-3 py-2 rounded-lg text-[10px] font-black transition-all duration-200 flex items-center space-x-1.5 border border-transparent hover:border-slate-900">
+                <svg class="w-3 h-3 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <span>CARI</span>
+            </button>
+            
+            <div class="w-px h-4 bg-slate-200 mx-1"></div> {{-- Garis Pemisah Tipis --}}
+
+            <a href="{{ route('reports.index') }}" class="pr-2 py-2 text-[9px] font-bold text-slate-400 hover:text-red-500 transition">RESET</a>
+        </form>
+
+        {{-- Tombol Cetak PDF Merah (Ukuran Pas) --}}
+        <a href="{{ route('reports.pdf', request()->all()) }}" 
+            class="group bg-rose-600 px-3 py-2 rounded-xl shadow-md shadow-rose-200 hover:bg-rose-700 transition-all flex items-center space-x-2 border border-rose-500 hover:scale-105 active:scale-95">
+            
+            {{-- Ikon sedikit lebih besar dari yang tadi --}}
+            <div class="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center text-xs group-hover:bg-white/30 transition-colors">
+                📄
+            </div>
+
+            {{-- Teks balik ke text-[10px] biar mantap --}}
+            <span class="text-[10px] font-black text-white uppercase tracking-wider not-italic">CETAK PDF</span>
+
+            <svg class="w-3 h-3 text-rose-100 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+        </a>
+    </div>
+</div>
 
             {{-- Stat Cards: Menampilkan hasil hitungan dari Controller --}}
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
@@ -157,6 +231,7 @@
     
 </div>
 
+
 {{-- Ringkasan Metode Bayar --}}
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
     <div class="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-200">
@@ -181,8 +256,29 @@
     </div>
 </div>
 
+            {{-- Action Cards --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+    {{-- Card Catat Pengeluaran: Dibuat seukuran dengan Stat Cards --}}
+    <a href="{{ route('expenses.create') }}" class="group bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:border-slate-900 transition-all flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                            💸
+                        </div>
+                        <div>
+                            <h4 class="text-[10px] font-black text-slate-800 uppercase tracking-wider not-italic">Catat Pengeluaran</h4>
+                            <p class="text-[9px] text-slate-400 leading-tight uppercase font-bold mt-0.5 not-italic">Input Stok & Oprasional</p>
+                        </div>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-300 group-hover:text-slate-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </a>               
+            </div>
+
 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-    <h3 class="text-lg font-black italic tracking-tighter uppercase mb-4 text-slate-900">Riwayat Transaksi</h3>
+    <h3 class="text-lg font-black not-italic tracking-wide uppercase mb-4 text-slate-900">
+        Riwayat Transaksi
+    </h3>
     
     <table class="w-full text-left">
         <thead>
@@ -230,8 +326,7 @@
         @endif
 </div>
 
-
-
+    
 {{-- MODAL DETAIL PENDAPATAN --}}
 <div id="modalRevenue" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden">
@@ -320,7 +415,9 @@
 {{-- TABEL PRODUK TERJUAL --}}
 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
     <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-        <h3 class="text-sm font-bold text-slate-800 uppercase italic">📦 Produk Terjual Periode Ini</h3>
+        <h3 class="text-sm font-bold text-slate-800 uppercase not-italic tracking-wide">
+            📦 Produk Terjual Periode Ini
+        </h3>
         <span class="text-[10px] font-bold bg-slate-900 text-white px-2 py-1 rounded">LIVE UPDATE</span>
     </div>
     <div class="overflow-x-auto">
@@ -353,30 +450,7 @@
     </div>
 </div>
 
-            {{-- Action Cards --}}
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <a href="{{ route('expenses.create') }}" class="group bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:border-slate-900 transition-all flex items-center justify-between">
-                    <div class="flex items-center space-x-5">
-                        <div class="w-14 h-14 rounded-full bg-slate-50 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">💸</div>
-                        <div>
-                            <h4 class="text-sm font-bold text-slate-800 uppercase">Catat Pengeluaran Baru</h4>
-                            <p class="text-[11px] text-slate-400 mt-1">Input belanja stok, listrik, atau operasional tanpa ribet.</p>
-                        </div>
-                    </div>
-                    <svg class="w-5 h-5 text-slate-300 group-hover:text-slate-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                </a>
 
-                <a href="{{ route('reports.pdf', ['filter' => $filter]) }}" class="group bg-slate-900 p-8 rounded-2xl shadow-lg hover:shadow-slate-200 transition-all flex items-center justify-between">
-                    <div class="flex items-center space-x-5">
-                        <div class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-2xl">📄</div>
-                        <div>
-                            <h4 class="text-sm font-bold text-white uppercase">Cetak Laporan PDF</h4>
-                            <p class="text-[11px] text-slate-400 mt-1">Unduh rekapitulasi laporan untuk arsip toko.</p>
-                        </div>
-                    </div>
-                    <svg class="w-5 h-5 text-slate-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                </a>
-            </div>
         </div>
     </main>
 </div>

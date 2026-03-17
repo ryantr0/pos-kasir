@@ -99,8 +99,8 @@
                                 <textarea name="description" rows="4" 
                                     class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 outline-none transition text-sm">{{ $product->description }}</textarea>
                             </div>
-                        </div>
 
+                    </div>
                         <div class="space-y-6">
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Foto Produk (Biarkan kosong jika tidak diganti)</label>
@@ -123,6 +123,18 @@
                             </div>
                         </div>
                     </div>
+
+                    </div>
+                        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <div>
+                                <span class="block text-sm font-bold text-slate-700">Status Ketersediaan</span>
+                                <span class="text-[10px] text-slate-500 italic">*Matikan jika stok barang sedang kosong</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_ready" value="1" class="sr-only peer" {{ $product->is_ready ? 'checked' : '' }}>
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                            </label>
+                        </div>
 
                     <div class="mt-10 pt-8 border-t border-slate-100 flex items-center justify-end space-x-4">
                         <a href="{{ route('products.index') }}" class="text-xs font-bold text-slate-400 hover:text-slate-600 transition tracking-widest">BATAL</a>

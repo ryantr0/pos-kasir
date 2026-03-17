@@ -13,6 +13,11 @@ class ReportController extends Controller
 {
     // 1. Ambil filter dari URL (default: daily)
     $filter = $request->get('filter', 'daily');
+    
+    // --- TAMBAHAN: Ambil input tanggal custom ---
+    $startDate = $request->get('start_date');
+    $endDate = $request->get('end_date');
+    
     $now = \Carbon\Carbon::now();
 
     // 2. Inisialisasi Query
@@ -20,8 +25,22 @@ class ReportController extends Controller
     $expenseQuery = \App\Models\Expense::query();
     $soldProductsQuery = \App\Models\OrderDetail::query();
 
-    // 3. Logic Filter Waktu (Tetap Dipertahankan Sesuai Aslinya)
-    if ($filter == 'daily') {
+    // 3. Logic Filter Waktu
+    // --- PERBAIKAN: Jika ada input start_date & end_date, pakai range tersebut ---
+    if ($startDate && $endDate) {
+        $filter = $startDate . ' s/d ' . $endDate; // Update label filter untuk tampilan
+        $start = $startDate . " 00:00:00";
+        $end = $endDate . " 23:59:59";
+
+        $revenueQuery->whereBetween('created_at', [$start, $end]);
+        $expenseQuery->whereBetween('date', [$startDate, $endDate]);
+        
+        $soldProductsQuery->whereHas('order', function($q) use ($start, $end) {
+            $q->whereBetween('created_at', [$start, $end]);
+        });
+    } 
+    // --- LOGIKA ASLI TETAP DIPERTAHANKAN (Harian, Mingguan, Bulanan) ---
+    elseif ($filter == 'daily') {
         $today = \Carbon\Carbon::today();
         $revenueQuery->whereDate('created_at', $today);
         $expenseQuery->whereDate('date', $today);
@@ -51,7 +70,7 @@ class ReportController extends Controller
         });
     }
 
-    // 4. AMBIL DETAIL DATA
+    // 4. AMBIL DETAIL DATA (Tidak berubah)
     $orders = $revenueQuery->with(['items.product', 'user'])->latest()->get(); 
     $expenseDetails = $expenseQuery->latest()->get();
 
@@ -61,14 +80,13 @@ class ReportController extends Controller
                         ->orderBy('total_qty', 'desc')
                         ->get();
 
-    // 5. Hitung Totalnya
+    // 5. Hitung Totalnya (Tidak berubah)
     $totalRevenue = $orders->sum('total_price');
     $totalExpense = $expenseDetails->sum('amount');
     $netProfit = $totalRevenue - $totalExpense;
 
-    // --- PERBAIKAN DI SINI: Ditambahkan trim() untuk hapus spasi gaib ---
+    // Logic trim() tetap aman
     $qrisTotal = $orders->filter(function($order) {
-        // strtoupper + trim agar 'qris', 'QRIS ', 'Qris' semua terdeteksi sama
         return strtoupper(trim($order->payment_method)) === 'QRIS';
     })->sum('total_price');
 
@@ -92,57 +110,64 @@ class ReportController extends Controller
     ]);
 }
 
-   public function downloadPDF(Request $request) 
-{
-    $filter = $request->get('filter', 'daily');
-    $queryRevenue = Order::query();
-    $queryExpense = Expense::query();
+public function downloadPDF(Request $request) 
+    {
+        $filter = $request->get('filter', 'daily');
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        
+        $queryRevenue = Order::query();
+        $queryExpense = Expense::query();
 
-    // Logic Filter Tetap Sama (Tidak diubah)
-    if ($filter == 'daily') {
-        $queryRevenue->whereDate('created_at', today());
-        $queryExpense->whereDate('date', today());
-    } elseif ($filter == 'weekly') {
-        $queryRevenue->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
-        $queryExpense->whereBetween('date', [now()->startOfWeek(), now()->endOfWeek()]);
-    } elseif ($filter == 'monthly') {
-        $queryRevenue->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year);
-        $queryExpense->whereMonth('date', now()->month)->whereYear('date', now()->year);
+        // --- PERBAIKAN: Tambahkan logika custom date agar PDF sinkron dengan tampilan web ---
+        if ($startDate && $endDate) {
+            $filter = $startDate . ' sd ' . $endDate; // Pakai 'sd' bukan 's/d' agar file tidak error
+            $queryRevenue->whereBetween('created_at', [$startDate . " 00:00:00", $endDate . " 23:59:59"]);
+            $queryExpense->whereBetween('date', [$startDate, $endDate]);
+        } 
+        elseif ($filter == 'daily') {
+            $queryRevenue->whereDate('created_at', today());
+            $queryExpense->whereDate('date', today());
+        } elseif ($filter == 'weekly') {
+            $queryRevenue->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+            $queryExpense->whereBetween('date', [now()->startOfWeek()->toDateString(), now()->endOfWeek()->toDateString()]);
+        } elseif ($filter == 'monthly') {
+            $queryRevenue->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year);
+            $queryExpense->whereMonth('date', now()->month)->whereYear('date', now()->year);
+        }
+
+        $revenueDetails = $queryRevenue->with(['items.product', 'user'])->latest()->get();
+        $expenseDetails = $queryExpense->latest()->get();
+        
+        $totalRevenue = $revenueDetails->sum('total_price');
+        $totalExpense = $expenseDetails->sum('amount');
+        $netProfit = $totalRevenue - $totalExpense;
+
+        $qrisTotal = $revenueDetails->filter(function($i) {
+            return strtoupper(trim($i->payment_method)) === 'QRIS';
+        })->sum('total_price');
+
+        $cashTotal = $revenueDetails->filter(function($i) {
+            return strtoupper(trim($i->payment_method)) === 'CASH' || empty($i->payment_method);
+        })->sum('total_price');
+
+        // --- PERBAIKAN: Bersihkan nama file dari karakter '/' agar tidak error ---
+        $safeFilterName = str_replace(['/', ' '], ['-', '_'], $filter);
+        $dateString = now()->format('d-m-Y');
+        $fileName = 'Laporan-Ryan-Coffee-' . $safeFilterName . '-' . $dateString . '.pdf';
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.pdf', compact(
+            'totalRevenue', 
+            'totalExpense', 
+            'netProfit', 
+            'filter',
+            'revenueDetails',
+            'expenseDetails',
+            'qrisTotal',
+            'cashTotal'
+        ));
+
+        return $pdf->download($fileName);
     }
 
-    // Tambahkan 'user' di eager loading agar nama kasir muncul di PDF tanpa error
-    $revenueDetails = $queryRevenue->with(['items.product', 'user'])->latest()->get();
-    $expenseDetails = $queryExpense->latest()->get();
-    
-    $totalRevenue = $revenueDetails->sum('total_price');
-    $totalExpense = $expenseDetails->sum('amount');
-    $netProfit = $totalRevenue - $totalExpense;
-
-    // --- HITUNGAN SALDO (QRIS vs CASH) ---
-    // Menggunakan strtoupper untuk antisipasi perbedaan case di database
-    $qrisTotal = $revenueDetails->filter(function($i) {
-        return strtoupper($i->payment_method) === 'QRIS';
-    })->sum('total_price');
-
-    $cashTotal = $revenueDetails->filter(function($i) {
-        return strtoupper($i->payment_method) === 'CASH' || empty($i->payment_method);
-    })->sum('total_price');
-
-    $dateString = now()->translatedFormat('d-F-Y');
-    $fileName = 'Laporan-Ryan-Coffee-' . ucfirst($filter) . '-' . $dateString . '.pdf';
-
-    // Kirim semua variabel ke view PDF
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.pdf', compact(
-        'totalRevenue', 
-        'totalExpense', 
-        'netProfit', 
-        'filter',
-        'revenueDetails',
-        'expenseDetails',
-        'qrisTotal',
-        'cashTotal'
-    ));
-
-    return $pdf->download($fileName);
-}
 }

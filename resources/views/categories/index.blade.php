@@ -142,8 +142,12 @@
                             <td class="px-6 py-4">
                                 {{-- PERUBAHAN: Sekarang bisa diklik untuk buka Modal Produk --}}
                                 <button type="button" onclick="openCategoryModal({{ $category->id }}, '{{ $category->name }}')" class="text-left outline-none group">
-                                    <p class="text-sm font-bold text-slate-800 uppercase italic tracking-tight group-hover:text-blue-600 transition-colors">{{ $category->name }}</p>
-                                    <p class="text-[10px] text-slate-400">Slug: {{ $category->slug }} (Klik untuk detail)</p>
+                                    <p class="text-sm font-black text-slate-800 uppercase tracking-wider not-italic">
+                                        {{ $category->name }}
+                                    </p>
+                                    <p class="text-[10px] text-slate-400 uppercase tracking-tight not-italic">
+                                        Slug: {{ $category->slug }} (Klik untuk detail)
+                                    </p>
                                 </button>
                             </td>
                             <td class="px-6 py-4 text-center">
@@ -183,8 +187,9 @@
         <div class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-200">
             <div class="bg-white px-6 py-6 border-b border-slate-100 flex justify-between items-center">
                 <div>
-                    <h3 id="modal-title" class="text-sm font-black text-slate-900 uppercase tracking-widest">NAMA KATEGORI</h3>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Daftar Produk Terkait</p>
+                    {{-- Judul: Ditambah not-italic biar pasti tegak, font-black biar tegas --}}
+                    <h3 id="modal-title" class="text-sm font-black text-slate-900 uppercase tracking-widest not-italic">NAMA KATEGORI</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight not-italic">Daftar Produk Terkait</p>
                 </div>
                 <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-900 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -196,7 +201,8 @@
                 </div>
             </div>
             <div class="bg-slate-50 px-6 py-4 border-t border-slate-100">
-                <button onclick="closeCategoryModal()" class="w-full bg-slate-900 text-white px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-slate-200">
+                {{-- Tombol Tutup: Juga dipastikan not-italic --}}
+                <button onclick="closeCategoryModal()" class="w-full bg-slate-900 text-white px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-slate-200 not-italic">
                     Tutup Detail
                 </button>
             </div>
@@ -229,7 +235,6 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // PENAMBAHAN: Fungsi JavaScript untuk Modal List Produk
     function openCategoryModal(categoryId, categoryName) {
         const modal = document.getElementById('category-modal');
         const modalTitle = document.getElementById('modal-title');
@@ -239,7 +244,6 @@
         modalTitle.textContent = categoryName;
         modalContent.innerHTML = `<div class="flex justify-center py-10"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div></div>`;
 
-        // Fetch data produk dari route API (Pastikan route /api/categories/{id}/products sudah ada)
         fetch(`/api/categories/${categoryId}/products`)
             .then(response => response.json())
             .then(products => {
@@ -250,14 +254,24 @@
 
                 let html = '';
                 products.forEach(product => {
+                    // LOGIKA TAMBAHAN: Cek status is_ready
+                    const isReady = product.is_ready; 
+                    
                     html += `
-                    <div class="flex items-center p-3 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-300 transition-all">
-                        <div class="w-12 h-12 bg-white rounded-xl border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <div class="flex items-center p-3 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-300 transition-all ${!isReady ? 'opacity-70' : ''}">
+                        <div class="w-12 h-12 bg-white rounded-xl border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0 ${!isReady ? 'grayscale' : ''}">
                             ${product.image ? `<img src="/storage/${product.image}" class="w-full h-full object-cover">` : `<svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`}
                         </div>
                         <div class="ml-4 flex-1">
-                            <p class="text-[11px] font-black text-slate-800 uppercase leading-none">${product.name}</p>
-                            <p class="text-[10px] text-emerald-600 font-bold mt-1">Rp ${new Intl.NumberFormat('id-ID').format(product.price)}</p>
+                            <div class="flex justify-between items-start">
+                                <p class="text-[11px] font-black text-slate-800 uppercase leading-none">${product.name}</p>
+                                
+                                {{-- LABEL STOK HABIS --}}
+                                ${!isReady ? `<span class="text-[8px] font-black bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full uppercase tracking-tighter">Habis</span>` : ''}
+                            </div>
+                            <p class="text-[10px] ${!isReady ? 'text-slate-400 line-through' : 'text-emerald-600'} font-bold mt-1">
+                                Rp ${new Intl.NumberFormat('id-ID').format(product.price)}
+                            </p>
                         </div>
                     </div>`;
                 });

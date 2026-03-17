@@ -16,11 +16,13 @@ class Product extends Model
         'description',
         'price',
         'image',
-        'category_id' // Pakai category_id supaya nyambung ke tabel categories
+        'category_id', // Pakai category_id supaya nyambung ke tabel categories
+        'is_ready'     // TAMBAHKAN INI: Agar status stok bisa tersimpan di database
     ];
 
     protected $casts = [
-        'price' => 'integer'
+        'price'    => 'integer',
+        'is_ready' => 'boolean' // TAMBAHKAN INI: Agar otomatis jadi True/False saat dipanggil di JS
     ];
 
     /*
