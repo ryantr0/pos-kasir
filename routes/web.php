@@ -11,6 +11,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\PurchaseController;
 use App\Models\Product;
+use App\Http\Controllers\AIChatController;
 
 // 1. Landing Page
 Route::get('/', function () {
@@ -85,7 +86,7 @@ Route::middleware(['auth'])->group(function () {
         return Product::where('category_id', $id)->get();
     });
     
-
+    Route::post('/ai/ask', [AIChatController::class, 'ask'])->name('ai.ask');
 }); // Penutup Middleware Group yang bener
 
 require __DIR__.'/auth.php';

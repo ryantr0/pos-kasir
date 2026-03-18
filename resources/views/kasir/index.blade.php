@@ -105,7 +105,7 @@
                             </span>
                             <input type="text" id="searchInput" onkeyup="filterProducts()" 
                                 class="block w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all shadow-sm" 
-                                placeholder="Cari menu favorit pelanggan...">
+                                placeholder="Cari menu ">
                         </div>
                         <div class="hidden md:flex items-center space-x-2 bg-white px-3 py-1 rounded-full border border-slate-100 shadow-sm">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>

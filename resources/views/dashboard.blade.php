@@ -248,6 +248,59 @@
 </div>
 
 
+
+<div class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans text-slate-700">
+    
+    <div id="ai-chat-window" class="hidden mb-6 w-80 sm:w-96 transition-all duration-500 ease-out transform scale-90 opacity-0 origin-bottom-right">
+        <div class="bg-white rounded-[2.5rem] overflow-hidden border border-[#87a96b]/20 shadow-2xl shadow-[#87a96b]/10">
+            
+            <div class="bg-[#87a96b] p-6 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center text-xl backdrop-blur-md">🤖</div>
+                    <div>
+                        <h3 class="text-xs font-bold text-white uppercase tracking-widest">WARUNG RZ Assistant</h3>
+                        <span class="text-[9px] text-white/80 flex items-center">
+                            <span class="w-1.5 h-1.5 bg-white rounded-full mr-1 animate-pulse"></span> Online
+                        </span>
+                    </div>
+                </div>
+                <button onclick="toggleChat()" class="text-white/70 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div id="chat-content" class="h-80 overflow-y-auto p-6 space-y-4 bg-[#f9fbf7] scrollbar-hide">
+                <div class="flex justify-start">
+                    <div class="max-w-[85%] bg-white border border-[#87a96b]/10 text-[#5a7247] p-4 rounded-2xl rounded-tl-none text-[11px] shadow-sm leading-relaxed">
+                        Halo ! Ada yang mau ditanyakan saat ini ?
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white border-t border-[#87a96b]/5">
+                <div class="relative flex items-center bg-[#f3f6f0] rounded-2xl p-1.5 transition-all focus-within:bg-white focus-within:ring-2 focus-within:ring-[#87a96b]/20">
+                    <input type="text" id="chat-input" 
+                        class="w-full bg-transparent border-none py-2 px-3 text-[11px] focus:outline-none placeholder-[#87a96b]/40" 
+                        placeholder="Tulis pesan...">
+                    <button onclick="sendToAI()" class="bg-[#87a96b] text-white p-2.5 rounded-xl hover:bg-[#76965a] transition-all active:scale-90 shadow-lg shadow-[#87a96b]/20">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button onclick="toggleChat()" id="chat-btn" 
+        class="animate-floating w-16 h-16 bg-[#87a96b] text-white rounded-[1.8rem] flex items-center justify-center shadow-2xl shadow-[#87a96b]/30 transition-all duration-300 active:scale-90 group relative">
+        <span class="text-3xl group-hover:scale-110 transition-transform">🤖</span>
+        <span class="absolute -top-1 -right-1 flex h-5 w-5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#87a96b] opacity-40"></span>
+            <span class="relative inline-flex rounded-full h-5 w-5 bg-[#87a96b] border-4 border-white"></span>
+        </span>
+    </button>
+</div>
+
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // --- 1. LOGIKA GRAFIK (SAGE GREEN THEME) ---
@@ -388,6 +441,76 @@ document.addEventListener('DOMContentLoaded', function() {
 
     setInterval(updateClock, 1000);
     updateClock();
+});
+
+async function sendChat() {
+    const input = document.getElementById('user-input');
+    const chatBox = document.getElementById('chat-box');
+    const msg = input.value;
+    
+    chatBox.innerHTML += `<p class="text-blue-600"><b>Kamu:</b> ${msg}</p>`;
+    input.value = '';
+
+    const res = await fetch("{{ route('ai.ask') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+        body: JSON.stringify({ message: msg })
+    });
+    
+    const data = await res.json();
+    chatBox.innerHTML += `<p class="text-slate-800"><b>AI:</b> ${data.answer}</p>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// Fungsi buat buka/tutup chat
+function toggleChat() {
+    const window = document.getElementById('ai-chat-window');
+    const btn = document.getElementById('chat-btn');
+    
+    if (window.classList.contains('hidden')) {
+        window.classList.remove('hidden');
+        setTimeout(() => {
+            window.classList.remove('scale-95', 'opacity-0');
+            window.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    } else {
+        window.classList.add('scale-95', 'opacity-0');
+        window.classList.remove('scale-100', 'opacity-100');
+        setTimeout(() => {
+            window.classList.add('hidden');
+        }, 300);
+    }
+}
+
+// Logic kirim pesan (sama seperti sebelumnya)
+async function sendToAI() {
+    const input = document.getElementById('chat-input');
+    const box = document.getElementById('chat-content');
+    if(!input.value) return;
+
+    const userMsg = input.value;
+    box.innerHTML += `<div class="flex justify-end"><div class="text-[10px] text-white bg-rose-600 p-3 rounded-xl border border-rose-500 shadow-sm max-w-[80%] not-italic"><b>Kamu:</b> ${userMsg}</div></div>`;
+    input.value = '';
+    box.scrollTop = box.scrollHeight;
+
+    try {
+        const res = await fetch("{{ route('ai.ask') }}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+            body: JSON.stringify({ message: userMsg })
+        });
+        
+        const data = await res.json();
+        box.innerHTML += `<div class="flex justify-start"><div class="text-[10px] text-slate-200 bg-slate-800 p-3 rounded-xl border border-slate-700 max-w-[80%] not-italic"><b>AI:</b> ${data.answer}</div></div>`;
+    } catch (e) {
+        box.innerHTML += `<div class="text-[10px] text-red-400 p-2 italic">Aduh Bang, koneksi putus...</div>`;
+    }
+    box.scrollTop = box.scrollHeight;
+}
+
+// Support enter buat kirim
+document.getElementById('chat-input').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') sendToAI();
 });
 </script>
 
