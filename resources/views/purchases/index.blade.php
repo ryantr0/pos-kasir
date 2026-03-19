@@ -115,7 +115,9 @@
             </div>
         </header>
 
-        
+    <div class="p-4 space-y-8">
+        <p class="text-[10px] text-slate-700 font-medium uppercase tracking-widest">SILAHKAN CATAT DENGAN DETAIL BELANJA BARANG ! </p>
+    </div>
 
             <div class="p-8 space-y-8">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">

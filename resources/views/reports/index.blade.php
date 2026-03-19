@@ -457,39 +457,37 @@
 
 <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans text-slate-700">
     
-    <div id="ai-chat-window" class="hidden mb-6 w-80 sm:w-96 transition-all duration-500 ease-out transform scale-90 opacity-0 origin-bottom-right">
-        <div class="bg-white rounded-[2.5rem] overflow-hidden border border-[#87a96b]/20 shadow-2xl shadow-[#87a96b]/10">
+    <div id="ai-chat-window" class="hidden mb-4 w-80 sm:w-96 transition-all duration-300 ease-in-out transform scale-95 opacity-0 origin-bottom-right">
+        <div class="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-xl">
             
-            <div class="bg-[#87a96b] p-6 flex items-center justify-between">
+            <div class="bg-slate-900 p-4 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center text-xl backdrop-blur-md">🤖</div>
+                    <div class="w-8 h-8 bg-slate-800 rounded flex items-center justify-center text-lg border border-slate-700">🤖</div>
                     <div>
-                        <h3 class="text-xs font-bold text-white uppercase tracking-widest">WARUNG RZ Assistant</h3>
-                        <span class="text-[9px] text-white/80 flex items-center">
-                            <span class="w-1.5 h-1.5 bg-white rounded-full mr-1 animate-pulse"></span> Online
-                        </span>
+                        <h3 class="text-[11px] font-bold text-white uppercase tracking-wider">RZ Assistant</h3>
+                        <span class="text-[9px] text-slate-400 flex items-center italic">Ready to help</span>
                     </div>
                 </div>
-                <button onclick="toggleChat()" class="text-white/70 hover:text-white transition-colors">
+                <button onclick="toggleChat()" class="text-slate-400 hover:text-white transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             
-            <div id="chat-content" class="h-80 overflow-y-auto p-6 space-y-4 bg-[#f9fbf7] scrollbar-hide">
+            <div id="chat-content" class="h-80 overflow-y-auto p-4 space-y-4 bg-white scrollbar-thin scrollbar-thumb-slate-200">
                 <div class="flex justify-start">
-                    <div class="max-w-[85%] bg-white border border-[#87a96b]/10 text-[#5a7247] p-4 rounded-2xl rounded-tl-none text-[11px] shadow-sm leading-relaxed">
-                        Halo ! Ada yang mau ditanyakan saat ini ?
+                    <div class="max-w-[85%] bg-slate-50 border border-slate-100 text-slate-600 p-3 rounded-lg rounded-tl-none text-[11px] leading-relaxed">
+                        Halo. Ada yang bisa saya bantu hari ini?
                     </div>
                 </div>
             </div>
 
-            <div class="p-4 bg-white border-t border-[#87a96b]/5">
-                <div class="relative flex items-center bg-[#f3f6f0] rounded-2xl p-1.5 transition-all focus-within:bg-white focus-within:ring-2 focus-within:ring-[#87a96b]/20">
+            <div class="p-3 bg-white border-t border-slate-100">
+                <div class="flex items-center bg-slate-50 border border-slate-200 rounded-lg p-1 focus-within:bg-white focus-within:ring-1 focus-within:ring-slate-900 transition-all">
                     <input type="text" id="chat-input" 
-                        class="w-full bg-transparent border-none py-2 px-3 text-[11px] focus:outline-none placeholder-[#87a96b]/40" 
-                        placeholder="Tulis pesan...">
-                    <button onclick="sendToAI()" class="bg-[#87a96b] text-white p-2.5 rounded-xl hover:bg-[#76965a] transition-all active:scale-90 shadow-lg shadow-[#87a96b]/20">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        class="w-full bg-transparent border-none py-2 px-3 text-[11px] focus:outline-none placeholder-slate-400" 
+                        placeholder="Ketik pesan di sini...">
+                    <button onclick="sendToAI()" class="bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-black transition-all active:scale-95 text-[10px] font-bold uppercase tracking-tight">
+                        Kirim
                     </button>
                 </div>
             </div>
@@ -497,12 +495,8 @@
     </div>
 
     <button onclick="toggleChat()" id="chat-btn" 
-        class="animate-floating w-16 h-16 bg-[#87a96b] text-white rounded-[1.8rem] flex items-center justify-center shadow-2xl shadow-[#87a96b]/30 transition-all duration-300 active:scale-90 group relative">
-        <span class="text-3xl group-hover:scale-110 transition-transform">🤖</span>
-        <span class="absolute -top-1 -right-1 flex h-5 w-5">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#87a96b] opacity-40"></span>
-            <span class="relative inline-flex rounded-full h-5 w-5 bg-[#87a96b] border-4 border-white"></span>
-        </span>
+        class="w-14 h-14 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-lg hover:bg-black transition-all duration-300 active:scale-90 group">
+        <span class="text-2xl group-hover:scale-110 transition-transform">🤖</span>
     </button>
 </div>
 
@@ -616,33 +610,40 @@
 }
 
 // Fungsi buat buka/tutup chat
+// Fungsi toggle dengan animasi lebih cepat dan simpel
 function toggleChat() {
-    const window = document.getElementById('ai-chat-window');
-    const btn = document.getElementById('chat-btn');
+    const windowEl = document.getElementById('ai-chat-window');
     
-    if (window.classList.contains('hidden')) {
-        window.classList.remove('hidden');
+    if (windowEl.classList.contains('hidden')) {
+        windowEl.classList.remove('hidden');
         setTimeout(() => {
-            window.classList.remove('scale-95', 'opacity-0');
-            window.classList.add('scale-100', 'opacity-100');
+            windowEl.classList.remove('scale-95', 'opacity-0');
+            windowEl.classList.add('scale-100', 'opacity-100');
         }, 10);
     } else {
-        window.classList.add('scale-95', 'opacity-0');
-        window.classList.remove('scale-100', 'opacity-100');
+        windowEl.classList.add('scale-95', 'opacity-0');
+        windowEl.classList.remove('scale-100', 'opacity-100');
         setTimeout(() => {
-            window.classList.add('hidden');
-        }, 300);
+            windowEl.classList.add('hidden');
+        }, 200);
     }
 }
 
-// Logic kirim pesan (sama seperti sebelumnya)
 async function sendToAI() {
     const input = document.getElementById('chat-input');
     const box = document.getElementById('chat-content');
     if(!input.value) return;
 
     const userMsg = input.value;
-    box.innerHTML += `<div class="flex justify-end"><div class="text-[10px] text-white bg-rose-600 p-3 rounded-xl border border-rose-500 shadow-sm max-w-[80%] not-italic"><b>Kamu:</b> ${userMsg}</div></div>`;
+    
+    // Bubble Chat User: Hitam
+    box.innerHTML += `
+        <div class="flex justify-end">
+            <div class="max-w-[85%] bg-slate-900 text-white p-3 rounded-lg rounded-tr-none text-[11px] shadow-sm">
+                ${userMsg}
+            </div>
+        </div>`;
+    
     input.value = '';
     box.scrollTop = box.scrollHeight;
 
@@ -654,46 +655,23 @@ async function sendToAI() {
         });
         
         const data = await res.json();
-        box.innerHTML += `<div class="flex justify-start"><div class="text-[10px] text-slate-200 bg-slate-800 p-3 rounded-xl border border-slate-700 max-w-[80%] not-italic"><b>AI:</b> ${data.answer}</div></div>`;
+        
+        // Bubble Chat AI: Abu-abu Terang
+        box.innerHTML += `
+            <div class="flex justify-start">
+                <div class="max-w-[85%] bg-slate-100 border border-slate-200 text-slate-800 p-3 rounded-lg rounded-tl-none text-[11px]">
+                    ${data.answer}
+                </div>
+            </div>`;
     } catch (e) {
-        box.innerHTML += `<div class="text-[10px] text-red-400 p-2 italic">Aduh Bang, koneksi putus...</div>`;
+        box.innerHTML += `<div class="text-[9px] text-red-500 p-2 italic text-center">Gagal terhubung ke server.</div>`;
     }
     box.scrollTop = box.scrollHeight;
 }
 
-// Support enter buat kirim
 document.getElementById('chat-input').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') sendToAI();
 });
-
-function appendMessage(sender, text) {
-    const chatContent = document.getElementById('chat-content');
-    const msgDiv = document.createElement('div');
-    
-    if (sender === 'user') {
-        // Balon Chat User: Transparan dengan border Sage pekat
-        msgDiv.className = "flex justify-end animate-fade-in";
-        msgDiv.innerHTML = `
-            <div class="max-w-[85%] bg-[#87a96b]/10 border border-[#87a96b]/40 text-[#5a7247] p-3.5 rounded-2xl rounded-tr-none text-[11px] shadow-sm backdrop-blur-sm">
-                <span class="font-bold block mb-1 text-[#87a96b]">Kamu:</span>
-                ${text}
-            </div>
-        `;
-    } else {
-        // Balon Chat AI: Transparan Putih Bersih
-        msgDiv.className = "flex justify-start animate-fade-in";
-        msgDiv.innerHTML = `
-            <div class="max-w-[85%] bg-white/40 border border-[#87a96b]/10 text-[#5a7247] p-3.5 rounded-2xl rounded-tl-none text-[11px] shadow-sm backdrop-blur-sm">
-                <span class="font-bold block mb-1 text-[#87a96b]">AI:</span>
-                ${text}
-            </div>
-        `;
-    }
-    
-    chatContent.appendChild(msgDiv);
-    chatContent.scrollTop = chatContent.scrollHeight;
-
-}
 </script>
 
 </body>
