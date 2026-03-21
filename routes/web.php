@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
@@ -16,7 +17,12 @@ use App\Http\Controllers\AIChatController;
 // 1. Landing Page
 Route::get('/', function () {
     return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
+
+
 });
+
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
 // 2. Group Middleware Auth (Semua route di dalam sini aman)
 Route::middleware(['auth'])->group(function () {
@@ -88,7 +94,7 @@ Route::middleware(['auth'])->group(function () {
     });
     
     Route::post('/ai/ask', [AIChatController::class, 'ask'])->name('ai.ask');
-}); // Penutup Middleware Group yang bener
+}); 
 
 require __DIR__.'/auth.php';
 
