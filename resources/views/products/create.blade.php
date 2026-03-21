@@ -103,6 +103,7 @@
                                     class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all text-sm font-medium leading-relaxed"></textarea>
                             </div>
                         </div>
+                        
 
                         <div class="space-y-6">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 text-center">Preview Foto</label>
@@ -120,6 +121,7 @@
                                 <input type="file" name="image" id="image-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*">
                             </div>
                             
+                            
                             <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100">
                                 <h4 class="text-[10px] font-bold text-slate-800 uppercase tracking-widest mb-2 flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-2 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
@@ -134,7 +136,18 @@
                                 </ul>
                             </div>
                         </div>
+                        <div>
+    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3">Jumlah Stok</label>
+    <input type="number" name="stock" id="stock" required
+        class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all text-sm font-bold text-slate-900"
+        placeholder="Contoh: 50">
+    @error('stock')
+        <p class="text-red-500 text-[10px] mt-2 italic">{{ $message }}</p>
+    @enderror {{-- SUDAH DIPERBAIKI --}}
+</div>
                     </div>
+
+                    
 
                     <div class="mt-12 pt-8 border-t border-slate-100 flex items-center justify-end space-x-5">
                         <a href="{{ route('products.index') }}" class="text-[11px] font-bold text-slate-400 hover:text-slate-900 transition uppercase tracking-widest">Batalkan</a>

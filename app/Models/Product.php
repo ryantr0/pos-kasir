@@ -15,14 +15,16 @@ class Product extends Model
         'name',
         'description',
         'price',
+        'stock',      // Izin simpan stok
         'image',
-        'category_id', // Pakai category_id supaya nyambung ke tabel categories
-        'is_ready'     // TAMBAHKAN INI: Agar status stok bisa tersimpan di database
+        'category_id', 
+        'is_ready'    
     ];
 
     protected $casts = [
         'price'    => 'integer',
-        'is_ready' => 'boolean' // TAMBAHKAN INI: Agar otomatis jadi True/False saat dipanggil di JS
+        'stock'    => 'integer', // TAMBAHKAN INI: Biar dihitungnya enak (nggak jadi string)
+        'is_ready' => 'boolean' 
     ];
 
     /*
@@ -31,12 +33,8 @@ class Product extends Model
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * Relasi ke Kategori (Banyak produk punya satu kategori)
-     */
     public function category()
     {
-        // Menghubungkan ke model Category
         return $this->belongsTo(Category::class, 'category_id');
     }
 
@@ -48,7 +46,7 @@ class Product extends Model
 
     public function getImageUrlAttribute()
     {
-        if ($this->image) {
+        if ($this->image && file_exists(storage_path('app/public/' . $this->image))) {
             return asset('storage/' . $this->image);
         }
 

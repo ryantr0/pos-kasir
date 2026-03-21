@@ -58,38 +58,44 @@
     </div>
 
     <span class="section-title">Rincian Pendapatan (Penjualan)</span>
-    <table>
-        <thead>
-            <tr>
-                <th width="15%">Tanggal & Jam</th>
-                <th width="35%">Pelanggan & Item</th>
-                <th width="15%">Metode</th> <th width="15%">ID Order</th>
-                <th width="20%" class="text-right">Subtotal</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($revenueDetails as $rev)
-            <tr>
-                <td>{{ $rev->created_at->translatedFormat('d/m/Y H:i') }}</td>
-                <td>
-                    <strong>{{ strtoupper($rev->customer ?? 'GUEST') }}</strong>
-                    <div class="product-list">
-                        @foreach($rev->items as $detail)
-                            • {{ $detail->product->name ?? 'Produk' }} (x{{ $detail->quantity }})<br>
-                        @endforeach
-                    </div>
-                </td>
-                <td style="text-align: center;">
-                    <strong>{{ strtoupper($rev->payment_method ?? 'CASH') }}</strong>
-                </td>
-                <td>#{{ $rev->id }}</td>
-                <td class="text-right text-green">Rp {{ number_format($rev->total_price, 0, ',', '.') }}</td>
-            </tr>
-            @empty
-            <tr><td colspan="5" style="text-align: center; color: #94a3b8;">Tidak ada transaksi terekam.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+<table>
+    <thead>
+        <tr>
+            <th width="15%">Waktu</th>
+            <th width="30%">Pelanggan & Item</th>
+            <th width="15%">Kasir</th> {{-- TAMBAH KOLOM KASIR --}}
+            <th width="12%">Metode</th>
+            <th width="13%">ID Order</th>
+            <th width="15%" class="text-right">Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse($revenueDetails as $rev)
+        <tr>
+            <td>{{ $rev->created_at->translatedFormat('d/m/Y H:i') }}</td>
+            <td>
+                <strong>{{ strtoupper($rev->customer ?? 'GUEST') }}</strong>
+                <div class="product-list">
+                    @foreach($rev->items as $detail)
+                        • {{ $detail->product->name ?? 'Produk' }} (x{{ $detail->quantity }})<br>
+                    @endforeach
+                </div>
+            </td>
+            {{-- DATA KASIR --}}
+            <td style="font-size: 9px; text-transform: uppercase;">
+                {{ $rev->user->name ?? 'System' }}
+            </td>
+            <td style="text-align: center; font-size: 9px;">
+                <strong>{{ strtoupper($rev->payment_method ?? 'CASH') }}</strong>
+            </td>
+            <td>#{{ $rev->id }}</td>
+            <td class="text-right text-green">Rp {{ number_format($rev->total_price, 0, ',', '.') }}</td>
+        </tr>
+        @empty
+        <tr><td colspan="6" style="text-align: center; color: #94a3b8;">Tidak ada transaksi terekam.</td></tr>
+        @endforelse
+    </tbody>
+</table>
 
     <span class="section-title">Rincian Pengeluaran (Operasional)</span>
     <table>

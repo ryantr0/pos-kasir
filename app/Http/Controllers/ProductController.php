@@ -9,23 +9,24 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index(Request $request) // Tambahkan parameter $request di sini
-    {
-        // Mulai query dengan eager loading 'category'
-        $query = Product::with('category');
+        public function index(Request $request)
+        {
+            // 1. Mulai query dengan eager loading 'category' (Tetap seperti kode Abang)
+            $query = \App\Models\Product::with('category');
 
-        // LOGIKA TAMBAHAN: Cek apakah ada filter category_id dari halaman kategori
-        if ($request->has('category_id') && $request->category_id != '') {
-            $query->where('category_id', $request->category_id);
+            // 2. LOGIKA TAMBAHAN: Filter category_id (Tetap dipertahankan sesuai request Abang)
+            if ($request->has('category_id') && $request->category_id != '') {
+                $query->where('category_id', $request->category_id);
+            }
+
+            // 3. Ambil data terbaru (Pastikan kolom 'stock' sudah ada di database)
+            $products = $query->latest()->get();
+            
+            // 4. Ambil semua data kategori untuk label filter (Tetap dipertahankan)
+            $categories = \App\Models\Category::all();
+
+            return view('products.index', compact('products', 'categories'));
         }
-
-        $products = $query->latest()->get();
-        
-        // Ambil semua data kategori untuk dikirim ke view (berguna untuk label filter)
-        $categories = Category::all();
-
-        return view('products.index', compact('products', 'categories'));
-    }
 
     public function create()
     {
@@ -35,58 +36,61 @@ class ProductController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'name'        => 'required|string|max:255',
-            'price'       => 'required|numeric',
-            'category_id' => 'required|exists:categories,id', // Validasi harus ada di tabel categories
-            'description' => 'nullable|string',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
+{
+    $request->validate([
+        'name'        => 'required|string|max:255',
+        'price'       => 'required|numeric',
+        'stock'       => 'required|numeric|min:0', // TAMBAHKAN VALIDASI STOK
+        'category_id' => 'required|exists:categories,id',
+        'description' => 'nullable|string',
+        'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+    ]);
 
-        $data = $request->only(['name', 'price', 'category_id', 'description']);
+    // Tambahkan 'stock' ke dalam array only agar bisa disimpan
+    $data = $request->only(['name', 'price', 'stock', 'category_id', 'description']);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
-        }
-
-        \App\Models\Product::create($data);
-
-        return redirect()->route('products.index')->with('success', 'PRODUK BERHASIL DISIMPAN!');
+    if ($request->hasFile('image')) {
+        $data['image'] = $request->file('image')->store('products', 'public');
     }
 
-    public function edit(Product $product)
+    \App\Models\Product::create($data);
+
+    return redirect()->route('products.index')->with('success', 'PRODUK BERHASIL DISIMPAN!');
+}
+
+public function edit(Product $product)
     {
-        // Ambil semua kategori untuk dropdown di form edit
+        // Ambil semua kategori untuk dropdown di form edit (Sudah Benar)
         $categories = Category::all();
         return view('products.edit', compact('product', 'categories'));
     }
 
- public function update(Request $request, Product $product)
+public function update(Request $request, Product $product)
 {
-    // 1. Validasi data (is_ready kita buat nullable karena checkbox sering tidak terkirim kalau off)
+    // 1. Validasi data
     $validatedData = $request->validate([
         'name'        => 'required|string|max:255',
         'price'       => 'required|numeric',
+        'stock'       => 'required|integer|min:0', 
         'category_id' => 'required|exists:categories,id', 
         'description' => 'nullable|string',
         'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        'is_ready'    => 'nullable' // Tambahkan ini agar lolos validasi
+        'is_ready'    => 'required|in:0,1' // Tambahkan ini agar validasi select-nya ketat
     ]);
 
-    // 2. Logika hapus & simpan gambar (Sudah benar, tidak saya ubah)
+    // 2. Logika hapus & simpan gambar (Sudah benar sesuai kode Abang)
     if ($request->hasFile('image')) {
         if ($product->image) {
-            Storage::disk('public')->delete($product->image);
+            \Storage::disk('public')->delete($product->image);
         }
         $validatedData['image'] = $request->file('image')->store('products', 'public');
     }
 
-    // 3. LOGIKA KUNCI: Menentukan is_ready (True/False)
-    // Jika checkbox dicentang, nilainya true. Jika tidak ada di request, nilainya false.
-    $validatedData['is_ready'] = $request->has('is_ready');
+    // 3. LOGIKA KUNCI: Menentukan is_ready (DIUBAH AGAR BISA BACA SELECT)
+    // Pakai input() karena select dropdown selalu mengirimkan nilai, bukan cek keberadaan (has)
+    $validatedData['is_ready'] = $request->input('is_ready');
 
-    // 4. Update semua data termasuk is_ready
+    // 4. Update semua data (Sekarang stok dan status ready sudah sinkron)
     $product->update($validatedData);
 
     return redirect()->route('products.index')->with('success', 'PRODUK BERHASIL DIUPDATE!');

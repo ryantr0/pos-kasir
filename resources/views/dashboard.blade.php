@@ -78,6 +78,13 @@
                 </svg>
                 <span class="text-sm font-medium">Belanja Barang</span>
             </a>
+            <a href="{{ route('tutorial.index') }}" 
+            class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition {{ request()->routeIs('tutorial.*') ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18 18.246 18.477 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                <span class="text-sm font-medium">Panduan Sistem</span>
+            </a>
         </nav>
 
         <div class="p-4 border-t border-slate-100">
@@ -97,8 +104,8 @@
         </button>
     </form>
 </div>
-    </aside>
 
+    </aside>
     <main class="flex-1 overflow-y-auto">
         <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
             <div>
@@ -187,63 +194,133 @@
         </div>
     </div>
 
-{{-- Diagram Tren Pendapatan (Pro Version) --}}
-<div class="lg:col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col hover:shadow-xl hover:border-emerald-100 transition-all duration-500 group">
-    <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                {{-- Diubah dari text-xl ke text-sm, dan font-bold ke font-black biar tetap tegas walau kecil --}}
-                <h3 class="text-xs font-black text-slate-800 tracking-wider uppercase">STATISTIK PENJUALAN</h3>
+{{-- WIDGET KANAN: STATISTIK PENJUALAN (Clean Line Chart) --}}
+    <div class="lg:col-span-1 bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col hover:border-slate-400 transition-all duration-500 group">
+        <div class="mb-6 flex flex-col gap-4">
+            <div class="flex items-center gap-2">
+                <span class="flex h-2 w-2 rounded-full bg-slate-900 animate-pulse"></span>
+                <h3 class="text-xs font-black text-slate-800 tracking-wider uppercase">Statistik Penjualan</h3>
             </div>
+
+            <form action="{{ route('dashboard') }}" method="GET" class="flex items-center bg-slate-50 border border-slate-200 p-1 rounded-xl gap-2">
+                <div class="flex items-center space-x-1 px-1">
+                    <input type="date" name="start_date" value="{{ $start }}" class="w-24 text-[9px] font-bold border-none focus:ring-0 text-slate-600 bg-transparent p-0">
+                    <span class="text-slate-300 text-[10px]">—</span>
+                    <input type="date" name="end_date" value="{{ $end }}" class="w-24 text-[9px] font-bold border-none focus:ring-0 text-slate-600 bg-transparent p-0">
+                </div>
+                <button type="submit" class="bg-slate-900 text-white p-1.5 rounded-lg hover:bg-black transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+            </form>
         </div>
 
-        {{-- Filter Tanggal Mini --}}
-        <form action="{{ route('dashboard') }}" method="GET" class="flex items-center bg-slate-50 border border-slate-200 p-1 rounded-xl gap-2">
-            <div class="flex items-center space-x-1 px-1">
-                <input type="date" name="start_date" value="{{ $start }}" 
-                    class="w-24 text-[9px] font-bold border-none focus:ring-0 text-slate-600 bg-transparent p-0 transition-all">
-                <span class="text-slate-300 text-[10px]">—</span>
-                <input type="date" name="end_date" value="{{ $end }}" 
-                    class="w-24 text-[9px] font-bold border-none focus:ring-0 text-slate-600 bg-transparent p-0 transition-all">
-            </div>
-            <button type="submit" class="bg-slate-900 text-white p-1.5 rounded-lg hover:bg-emerald-600 transition-colors">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-            </button>
-        </form>
-    </div>
-
-    {{-- INI YANG PENTING: Tempat Grafiknya --}}
-    <div class="relative h-64 w-full">
-        <canvas id="salesChart"></canvas>
+        <div class="relative h-64 w-full">
+            <canvas id="salesChart"></canvas>
+        </div>
     </div>
 </div>
 
 {{-- Load Chart.js dari CDN --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-    <div class="px-6 py-4 border-b border-slate-100">
-        <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">Produk Terlaris</h3>
-    </div>
+{{-- Grid Utama: Pakai 3 kolom di layar besar --}}
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-5 items-start">
+    
+    {{-- WIDGET KIRI: PRODUK TERLARIS (Dibuat lebih lebar pakai col-span-2) --}}
+    <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">Produk Terlaris</h3>
+        </div>
 
-    <div class="p-6 space-y-4">
-        @forelse($produkTerlaris as $item)
-        <div class="flex items-center justify-between p-3 rounded-lg border border-slate-50 bg-slate-50/50">
-            <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400">#</div>
-                <div>
-                    {{-- Nama produk juga kita bikin tegas --}}
-                    <p class="text-xs font-bold text-slate-800 uppercase">{{ $item->name }}</p>
-                    <p class="text-[10px] text-slate-500 font-medium">{{ $item->sold }} TERJUAL</p>
+        <div class="p-1 space-y-1">
+            @forelse($produkTerlaris as $item)
+            <div class="flex items-center justify-between p-3 rounded-lg border border-slate-50 bg-slate-50/50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400">#</div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-800 uppercase">{{ $item->name }}</p>
+                        <p class="text-[10px] text-slate-500 font-medium">{{ $item->sold }} TERJUAL</p>
+                    </div>
                 </div>
             </div>
+            @empty
+            <div class="py-10 text-center text-slate-400 text-xs italic">Data penjualan kosong.</div>
+            @endforelse
+
+            {{-- AREA DIAGRAM --}}
+            <div class="mt-6 pt-6 border-t border-slate-50">
+                <div class="relative h-[350px] w-full"> {{-- Tinggi ditambah dikit biar puas --}}
+                    <canvas id="produkTerlarisChart"></canvas>
+                </div>
+                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest italic mt-4">
+                    * Data berdasarkan jumlah total item yang terjual.
+                </p>
+            </div>
         </div>
+    </div>
+
+ {{-- WIDGET KANAN: RADAR RESTOCK (Lebar Proporsional & Isi Lega) --}}
+{{-- UBAH: Saya tambahkan h-fit agar box tidak melar ke bawah. lg:w-[400px] agar di desktop lebar box pas. --}}
+<div x-data="{ open: false }" class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-fit self-start w-full lg:w-[400px]">
+    {{-- Header Lega --}}
+    <div class="px-3 py-4 border-b border-slate-100 flex items-center justify-between bg-rose-50/20">
+        <h3 class="text-xs font-black text-rose-600 uppercase tracking-widest flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            Radar Restock
+        </h3>
+        <span class="px-2 py-1 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-md uppercase">
+            ≤ 5
+        </span>
+    </div>
+    
+    {{-- Container List --}}
+    <div class="p-4 space-y-3">
+        @forelse($stokMenipis as $index => $item)
+            <div x-show="open || {{ $index }} < 5" 
+                 x-transition
+                 class="flex items-center justify-between p-3 rounded-lg border border-slate-50 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-100 transition-all group">
+                
+                {{-- Bagian Kiri: Icon + Nama --}}
+                <div class="flex items-center space-x-3.5 overflow-hidden">
+                    <div class="w-10 h-10 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-300 group-hover:text-rose-500 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                    <div class="leading-tight overflow-hidden">
+                        {{-- UBAH: max-w-xs biar nama produk nggak ngerusak layout dan font-sm --}}
+                        <p class="text-sm font-black text-slate-800 uppercase truncate max-w-xs group-hover:text-rose-700">{{ $item->name }}</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Stok Saat Ini</p>
+                    </div>
+                </div>
+
+                {{-- Bagian Kanan: Angka & Tombol --}}
+                {{-- UBAH: Saya pisahkan angka stok biar lebih gede dan mencolok --}}
+                <div class="flex items-center space-x-3 text-right">
+                    <div class="text-right">
+                        <p class="text-lg font-black text-rose-600 tabular-nums">{{ $item->stock }}</p>
+                        <p class="text-[9px] text-slate-500 font-medium -mt-1 uppercase tracking-wider">Unit</p>
+                    </div>
+                    <a href="{{ route('products.edit', $item->id) }}" class="text-[9px] font-black text-slate-500 hover:text-white hover:bg-slate-900 uppercase border border-slate-200 px-3 py-1.5 rounded-lg bg-white shadow-sm transition-all group-hover:scale-105 active:scale-95">
+                        RESTOCK
+                    </a>
+                </div>
+            </div>
         @empty
-        <div class="py-10 text-center text-slate-400 text-xs italic">Data penjualan kosong.</div>
+            <div class="py-10 text-center bg-slate-50 rounded-lg border-2 border-dashed border-slate-100">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] italic">Stock Tidak Ada Yang Kosong !</p>
+            </div>
         @endforelse
+
+        {{-- Tombol Toggle --}}
+        @if(count($stokMenipis) > 5)
+            <button @click="open = !open" class="w-full mt-2 py-3 border-t border-slate-100 text-[10px] font-black text-slate-400 hover:text-slate-900 transition-all uppercase tracking-[0.3em] flex items-center justify-center space-x-2">
+                <span x-text="open ? 'SEMBUNYIKAN' : 'LIHAT SEMUA ({{ count($stokMenipis) - 5 }} LAGI)'"></span>
+                <svg class="w-3 h-3 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+        @endif
     </div>
 </div>
 
@@ -497,6 +574,71 @@ async function sendToAI() {
 
 document.getElementById('chat-input').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') sendToAI();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Pengaturan Global Chart (Font & Warna Dasar)
+    Chart.defaults.color = '#64748b';
+    Chart.defaults.font.family = 'Inter, ui-sans-serif, system-ui';
+
+    // 1. Diagram Produk Terlaris (Bar Chart - Black Theme)
+    const ctxTerlaris = document.getElementById('produkTerlarisChart').getContext('2d');
+    new Chart(ctxTerlaris, {
+        type: 'bar',
+        data: {
+            labels: {!! json_encode($produkTerlaris->pluck('name')) !!},
+            datasets: [{
+                data: {!! json_encode($produkTerlaris->pluck('sold')) !!},
+                backgroundColor: '#0f172a', // Hitam tegas
+                borderRadius: 4, // Kotak sedikit tumpul, tidak lebay
+                barPercentage: 0.5,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { 
+                    beginAtZero: true,
+                    grid: { color: '#f1f5f9' },
+                    ticks: { font: { weight: 'bold' } }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 2. Statistik Penjualan (Line Chart - Black Theme)
+    const ctxSales = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctxSales, {
+        type: 'line',
+        data: {
+            labels: {!! isset($labelsSales) ? json_encode($labelsSales) : '["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"]' !!},
+            datasets: [{
+                data: {!! isset($dataSales) ? json_encode($dataSales) : '[0, 0, 0, 0, 0, 0, 0]' !!},
+                borderColor: '#0f172a', // Garis hitam
+                borderWidth: 2,
+                fill: false, // Tanpa warna di bawah garis biar minimalis
+                tension: 0.3, // Lekukan halus
+                pointRadius: 0, // Titik dihilangkan biar clean
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: '#0f172a'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { display: false }, // Sembunyikan angka Y biar fokus ke tren
+                x: { 
+                    grid: { display: false },
+                    ticks: { font: { size: 9, weight: '900' } }
+                }
+            }
+        }
+    });
 });
 </script>
 

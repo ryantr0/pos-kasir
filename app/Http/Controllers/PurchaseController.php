@@ -23,6 +23,7 @@ class PurchaseController extends Controller
     {
         $request->validate([
             'item_name' => 'required|string|max:255',
+            'category' => 'required|string',
             'qty' => 'required|integer|min:1',
             'purchase_price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
@@ -31,6 +32,7 @@ class PurchaseController extends Controller
         // Logika perhitungan total_price sudah benar
         Purchase::create([
             'item_name' => $request->item_name, 
+            'category' => $request->category,
             'qty' => $request->qty,
             'description' => $request->description,
             'purchase_price' => $request->purchase_price,
@@ -57,8 +59,11 @@ class PurchaseController extends Controller
 
     public function downloadPDF()
     {
-        $purchases = Purchase::latest()->get();
-        $pdf = Pdf::loadView('purchases.pdf', compact('purchases'));
+        // Mengambil semua data belanja, urut yang terbaru
+        $purchases = \App\Models\Purchase::orderBy('created_at', 'desc')->get();
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('purchases.pdf', compact('purchases'));
+        
         return $pdf->download('riwayat-belanja-warung-rz.pdf');
     }
 }

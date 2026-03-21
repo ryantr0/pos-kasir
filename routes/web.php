@@ -55,7 +55,8 @@ Route::middleware(['auth'])->group(function () {
             'transaksiHariIni'  => \App\Models\Order::whereDate('created_at', today())->count(),
             'transaksiTerbaru'  => \App\Models\Order::latest()->take(5)->get(),
             'salesData'         => $salesData,
-            'produkTerlaris'    => \App\Models\Product::orderBy('sold', 'desc')->take(3)->get(),
+            'produkTerlaris'    => \App\Models\Product::orderBy('sold', 'desc')->take(5)->get(),
+            'stokMenipis'       => Product::where('stock', '<=', 5)->get(),
             'start'             => $start, 
             'end'               => $end,
         ]);
@@ -127,5 +128,9 @@ require __DIR__.'/auth.php';
     Route::get('/purchases/download-pdf', [PurchaseController::class, 'downloadPDF'])->name('purchases.pdf');
     Route::resource('purchases', PurchaseController::class);
 });
+
+    Route::get('/tutorial', function () {
+        return view('tutorial.index');
+    })->name('tutorial.index');
 
 require __DIR__.'/auth.php';

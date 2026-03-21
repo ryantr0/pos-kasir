@@ -24,7 +24,7 @@
         <thead>
             <tr>
                 <th>Tanggal</th>
-                <th>Produk & Deskripsi</th>
+                <th>Kategori</th> <th>Produk & Deskripsi</th>
                 <th class="qty">Qty</th>
                 <th class="price">Total Harga</th>
             </tr>
@@ -32,21 +32,26 @@
         <tbody>
             @php $grandTotal = 0; @endphp
             @foreach($purchases as $item)
-            <tr>
-                <td>{{ $item->created_at->format('d/m/Y') }}</td>
-                <td>
-                    <div style="font-weight: bold; text-transform: uppercase;">{{ $item->item_name }}</div>
-                    <div style="font-size: 9px; color: #64748b;">{{ $item->description ?? '-' }}</div>
-                </td>
-                <td class="qty">{{ $item->qty }}</td>
-                <td class="price">Rp {{ number_format($item->total_price, 0, ',', '.') }}</td>
-            </tr>
-            @php $grandTotal += $item->total_price; @endphp
-            @endforeach
+                <tr>
+                    <td>{{ $item->created_at->format('d/m/Y') }}</td>
+                    
+                    <td style="text-transform: capitalize;">
+                        {{ $item->category ?? 'Lainnya' }}
+                    </td>
+                    
+                    <td>
+                        <div style="font-weight: bold; text-transform: uppercase;">{{ $item->item_name }}</div>
+                        <div style="font-size: 9px; color: #64748b;">{{ $item->description ?? '-' }}</div>
+                    </td>
+                    <td class="qty">{{ $item->qty }}</td>
+                    <td class="price">Rp {{ number_format($item->total_price, 0, ',', '.') }}</td>
+                </tr>
+                @php $grandTotal += $item->total_price; @endphp
+                @endforeach
         </tbody>
         <tfoot>
             <tr class="total-row">
-                <td colspan="3" style="text-align: right;">TOTAL PENGELUARAN :</td>
+                <td colspan="4" style="text-align: right;">TOTAL PENGELUARAN :</td>
                 <td class="price">Rp {{ number_format($grandTotal, 0, ',', '.') }}</td>
             </tr>
         </tfoot>
