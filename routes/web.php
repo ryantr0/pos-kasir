@@ -24,8 +24,18 @@ Route::get('/', function () {
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
+
+
 // 2. Group Middleware Auth (Semua route di dalam sini aman)
 Route::middleware(['auth'])->group(function () {
+
+
+        Route::middleware(['auth', 'admin'])->group(function () {
+        Route::get('/users', function () {
+            $semuaUser = \App\Models\User::all();
+            return view('admin.users_index', compact('semuaUser'));
+        })->name('admin.users');
+    });
 
     // DASHBOARD - Logic Fill Gaps Rp 0
     Route::get('/dashboard', function (Request $request) {
