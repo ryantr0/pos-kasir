@@ -23,7 +23,7 @@
             
             <aside 
                 :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-                class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-transform duration-300 transform lg:translate-x-0 lg:static lg:inset-0 flex flex-col">
+                class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-transform duration-300 transform lg:translate-x-0 lg:static lg:inset-0 flex flex-col shadow-2xl lg:shadow-none">
                 
                 <div class="p-6 flex flex-col items-center justify-center text-center border-b border-slate-50 dark:border-slate-800">
                     <div class="w-12 h-12 bg-slate-900 dark:bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg mb-3 rotate-3 hover:rotate-0 transition-transform duration-300">
@@ -63,12 +63,20 @@
                 </div>
             </aside>
 
-            <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false" class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm lg:hidden"></div>
+            <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false" 
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm lg:hidden">
+            </div>
 
-            <div class="flex-1 flex flex-col min-w-0">
+            <div class="flex-1 flex flex-col min-w-0 max-h-screen">
                 <header class="h-16 flex items-center justify-between px-4 lg:px-8 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30">
                     <div class="flex items-center">
-                        <button @click="sidebarOpen = true" class="p-2 mr-3 text-slate-600 dark:text-slate-400 lg:hidden hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                        <button @click="sidebarOpen = !sidebarOpen" class="p-2 mr-3 text-slate-600 dark:text-slate-400 lg:hidden hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg focus:outline-none">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                         </button>
                         <h2 class="text-sm font-extrabold text-slate-800 dark:text-white uppercase tracking-tight">
@@ -87,7 +95,7 @@
                     </div>
                 </header>
 
-                <main class="p-4 lg:p-8">
+                <main class="p-4 lg:p-8 overflow-y-auto">
                     @yield('content')
                 </main>
             </div>
