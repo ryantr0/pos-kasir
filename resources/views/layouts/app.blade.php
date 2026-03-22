@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ sidebarOpen: false, darkMode: localStorage.getItem('dark') === 'true' }" :class="{ 'dark': darkMode }">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Warung RZ') }}</title>
@@ -16,10 +16,15 @@
         <style>
             [x-cloak] { display: none !important; }
             body { font-family: 'Inter', sans-serif; }
+            /* Biar scrollbar lebih rapi di dark mode */
+            .dark ::-webkit-scrollbar { width: 5px; }
+            .dark ::-webkit-scrollbar-track { background: #0f172a; }
+            .dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         </style>
     </head>
     <body class="antialiased bg-[#f8fafc] dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
-        <div class="flex min-h-screen relative overflow-x-hidden">
+        
+        <div class="flex min-h-screen relative">
             
             <aside 
                 :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
@@ -64,38 +69,32 @@
             </aside>
 
             <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false" 
-                x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100"
-                x-transition:leave="transition ease-in duration-200"
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm lg:hidden">
+                class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm lg:hidden transition-opacity duration-300">
             </div>
 
-            <div class="flex-1 flex flex-col min-w-0 max-h-screen">
-                <header class="h-16 flex items-center justify-between px-4 lg:px-8 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30">
+            <div class="flex-1 flex flex-col min-w-0">
+                <header class="h-16 flex items-center justify-between px-4 lg:px-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30">
                     <div class="flex items-center">
-                        <button @click="sidebarOpen = !sidebarOpen" class="p-2 mr-3 text-slate-600 dark:text-slate-400 lg:hidden hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg focus:outline-none">
+                        <button @click="sidebarOpen = !sidebarOpen" class="p-2 mr-3 text-slate-600 dark:text-slate-400 lg:hidden hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                         </button>
-                        <h2 class="text-sm font-extrabold text-slate-800 dark:text-white uppercase tracking-tight">
-                            {{ $header ?? 'Dashboard Overview' }}
+                        <h2 class="text-sm font-extrabold text-slate-800 dark:text-white uppercase tracking-tight truncate">
+                            {{ $header ?? 'Dashboard' }}
                         </h2>
                     </div>
 
-                    <div class="flex items-center space-x-3">
-                        <button @click="darkMode = !darkMode; localStorage.setItem('dark', darkMode)" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-900 hover:text-white transition-all duration-300">
+                    <div class="flex items-center space-x-2 sm:space-x-3">
+                        <button @click="darkMode = !darkMode; localStorage.setItem('dark', darkMode)" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
                             <svg x-show="darkMode" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
                             <svg x-show="!darkMode" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 118.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                         </button>
-                        <div class="hidden sm:block text-[11px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg uppercase tracking-wider">
-                            {{ date('D, d M Y') }}
+                        <div class="hidden xs:block text-[10px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg uppercase">
+                            {{ date('d M Y') }}
                         </div>
                     </div>
                 </header>
 
-                <main class="p-4 lg:p-8 overflow-y-auto">
+                <main class="flex-1 p-4 lg:p-8 w-full max-w-full overflow-x-hidden">
                     @yield('content')
                 </main>
             </div>
