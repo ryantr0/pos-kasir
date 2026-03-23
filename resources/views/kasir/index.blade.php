@@ -195,7 +195,7 @@
 
             {{-- Tombol Add dengan Proteksi --}}
             <button 
-                @click="addToCart({{ $p->id }}, '{{ $p->name }}', {{ $p->price }}, {{ $p->is_ready ? 'true' : 'false' }})" 
+                @click="addToCart({{ $p->id }}, '{{ $p->name }}', {{ $p->price }}, {{ $p->is_ready ? 1 : 0 }})"
                 class="mt-auto w-full py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider transition-all flex items-center justify-center space-x-1
                 {{ $p->is_ready 
                     ? 'bg-slate-900 text-white hover:bg-emerald-600 active:scale-95' 
