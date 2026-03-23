@@ -195,7 +195,7 @@
 
             {{-- Tombol Add dengan Proteksi --}}
             <button 
-                @click="addToCart({{ $p->id }}, '{{ $p->name }}', {{ $p->price }}, {{ $p->is_ready ? 1 : 0 }})"
+                @click="addToCart({{ $p->id }}, '{{ $p->name }}', {{ $p->price }}, {{ $p->is_ready ? 'true' : 'false' }})" 
                 class="mt-auto w-full py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider transition-all flex items-center justify-center space-x-1
                 {{ $p->is_ready 
                     ? 'bg-slate-900 text-white hover:bg-emerald-600 active:scale-95' 
@@ -387,10 +387,10 @@
             changeAmount: 0,
             showQrisModal: false,
 
-            // TAMBAHAN: Pengecekan isReady di sini agar sinkron dengan toggle "Barang Habis"
+            // TAMBAHAN: Perbaikan pengecekan isReady agar lebih akurat (handle string/number)
             addToCart(id, name, price, isReady = true) {
-                // Cek jika status barang tidak tersedia (0 atau false)
-                if (!isReady || isReady == 0) {
+                // Cek status barang: jika 0, '0', atau false, maka dianggap kosong
+                if (isReady == 0 || isReady === false || isReady === 'false') {
                     Swal.fire({
                         icon: 'error',
                         title: 'Waduh!',
@@ -404,7 +404,8 @@
                 if (found) { 
                     found.qty++; 
                 } else { 
-                    this.cart.push({ id, name, price, qty: 1 }); 
+                    // Pastikan price diproses sebagai angka (Number) untuk kalkulasi
+                    this.cart.push({ id, name, price: Number(price), qty: 1 }); 
                 }
                 this.updateTotals();
             },
@@ -428,57 +429,66 @@
             },
 
             async checkout() {
-    const customerName = document.getElementById('customer_name').value;
-    
-    // Validasi Dasar
-    if (!customerName) { 
-        alert('Tolong isi nama pelanggan dulu, Bang!'); 
-        return; 
-    }
-    if (this.cart.length === 0) { 
-        alert('Keranjang masih kosong!'); 
-        return; 
-    }
-    if (this.paymentMethod === 'CASH' && this.cashAmount < this.totalPrice) {
-        alert('Uang tunai kurang, Bang!');
-        return;
-    }
+                const customerNameInput = document.getElementById('customer_name');
+                const customerName = customerNameInput ? customerNameInput.value : '';
+                
+                // 1. Validasi Input
+                if (!customerName.trim()) { 
+                    alert('Tolong isi nama pelanggan dulu, Bang!'); 
+                    return; 
+                }
+                if (this.cart.length === 0) { 
+                    alert('Keranjang masih kosong!'); 
+                    return; 
+                }
+                if (this.paymentMethod === 'CASH' && this.cashAmount < this.totalPrice) {
+                    alert('Uang tunai kurang! Kurang Rp' + (this.totalPrice - this.cashAmount).toLocaleString());
+                    return;
+                }
 
-    if (!confirm('Selesaikan transaksi atas nama ' + customerName + '?')) return;
+                if (!confirm('Selesaikan transaksi atas nama ' + customerName + '?')) return;
 
-    try {
-        const res = await fetch("{{ route('kasir.store') }}", {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json', // WAJIB: Agar Laravel kirim pesan error JSON, bukan halaman HTML
-                'X-CSRF-TOKEN': '{{ csrf_token() }}' 
-            },
-            body: JSON.stringify({ 
-                customer: customerName, 
-                total_price: this.totalPrice, 
-                payment_method: this.paymentMethod, 
-                cash_received: this.cashAmount,
-                items: this.cart // Pastikan ini mengirim array [{id, qty, price}, ...]
-            })
-        });
+                try {
+                    const res = await fetch("{{ route('kasir.store') }}", {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+                        },
+                        body: JSON.stringify({ 
+                            customer: customerName, 
+                            total_price: this.totalPrice, 
+                            payment_method: this.paymentMethod, 
+                            // Pastikan cash_received dikirim sebagai angka
+                            cash_received: this.paymentMethod === 'QRIS' ? this.totalPrice : Number(this.cashAmount),
+                            items: this.cart 
+                        })
+                    });
 
-        const data = await res.json(); // Ambil pesan error dari backend
+                    // Cek apakah responnya JSON atau bukan sebelum diproses
+                    const contentType = res.headers.get("content-type");
+                    let data = null;
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        data = await res.json();
+                    }
 
-        if (res.ok) { 
-            alert('Transaksi Berhasil!'); 
-            window.location.reload(); 
-        } else {
-            // Jika gagal, tampilkan pesan error asli dari Controller
-            alert('Gagal: ' + (data.message || 'Terjadi kesalahan sistem'));
-            console.error('Error Detail:', data);
+                    if (res.ok) { 
+                        alert('Transaksi Berhasil!'); 
+                        window.location.reload(); 
+                    } else {
+                        // Ambil pesan error dari Laravel jika ada, jika tidak pakai pesan default
+                        const errorMsg = (data && data.message) ? data.message : 'Terjadi kesalahan pada server (Error 500)';
+                        alert('Gagal Simpan: ' + errorMsg);
+                        console.error('Detail Error:', data);
+                    }
+                } catch (error) {
+                    alert('Gagal menghubungkan ke server. Cek koneksi internet atau server Railway kamu.');
+                    console.error('Fetch Error:', error);
+                }
+            }
         }
-    } catch (error) {
-        alert('Koneksi terputus atau server down!');
-        console.error(error);
     }
-}
-}
 </script>
 </body>
 </html>
