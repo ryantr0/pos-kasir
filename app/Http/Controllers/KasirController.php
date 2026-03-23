@@ -55,47 +55,48 @@ class KasirController extends Controller
     }
 
     public function store(Request $request) {
-    $request->validate([
-        'customer' => 'required',
-        'total_price' => 'required|numeric',
-        'items' => 'required|array',
-        'payment_method' => 'required',
-    ]);
-
     try {
+        // Tambahkan logging untuk cek data yang masuk dari frontend
+        \Log::info('Data Checkout:', $request->all());
+
         return DB::transaction(function () use ($request) {
-            // Simpan ke tabel orders
+            // Simpan ke orders
             $order = \App\Models\Order::create([
                 'customer' => $request->customer,
                 'total_price' => $request->total_price,
                 'payment_method' => $request->payment_method,
-                'user_id' => auth()->id() ?? 1, // Pastikan ada ID user
+                'user_id' => auth()->id() ?? 1, 
             ]);
 
             foreach ($request->items as $item) {
+                // Pastikan kolom-kolom ini ada di tabel order_details sesuai image_3f1087.png
+                DB::table('order_details')->insert([
+                    'order_id'   => $order->id,
+                    'product_id' => $item['id'],
+                    'quantity'   => $item['qty'],
+                    'price'      => $item['price'] ?? 0, // Ambil harga dari item kiriman frontend
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                // Update Stok
                 $product = \App\Models\Product::find($item['id']);
                 if ($product) {
-                    // Update stok
                     $product->decrement('stock', $item['qty']);
                     $product->increment('sold', $item['qty']);
-
-                    // Simpan detail sesuai image_3f1087.png
-                    DB::table('order_details')->insert([
-                        'order_id'   => $order->id,
-                        'product_id' => $product->id,
-                        'quantity'   => $item['qty'],
-                        'price'      => $product->price, // Pakai harga dari produk
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
                 }
             }
 
-            return response()->json(['status' => 'success', 'message' => 'Berhasil!']);
+            return response()->json(['status' => 'success']);
         });
     } catch (\Exception $e) {
-        // Biar Abang tau error aslinya di tab Response Inspect Element
-        return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        // INI PENTING: Menampilkan detail error di tab Response Network
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Detail Error: ' . $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ], 500);
     }
 }
 
