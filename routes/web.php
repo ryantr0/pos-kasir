@@ -149,10 +149,5 @@ require __DIR__.'/auth.php';
         return view('tutorial.index');
     })->name('tutorial.index');
 
-    // Hapus kode ini kalau gambar sudah muncul ya Bang!
-Route::get('/debug-link', function () {
-    Artisan::call('storage:link');
-    return "Jembatan gambar (Storage Link) sudah dibuat, Bang!";
-});
 
 require __DIR__.'/auth.php';
