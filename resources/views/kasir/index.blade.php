@@ -173,7 +173,10 @@
         {{-- Image Section --}}
         <div class="aspect-square bg-slate-50 relative overflow-hidden border-b border-slate-100 {{ !$p->is_ready ? 'grayscale' : '' }}">
             @if($p->image)
-                <img src="{{ asset('storage/' . $p->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                <img src="{{ asset('storage/' . $p->image) }}" 
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    {{-- JIKA GAMBAR ERROR / 404, PAKSA MUNCULIN INISIAL BIAR GAK KOSONG --}}
+                    onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center bg-slate-100 text-slate-400 font-bold text-xs uppercase\'>{{ substr($p->name, 0, 2) }}</div>'">
             @else
                 <div class="w-full h-full flex items-center justify-center text-slate-300 font-bold text-xs uppercase">
                     {{ substr($p->name, 0, 2) }}
@@ -425,47 +428,57 @@
             },
 
             async checkout() {
-                const customerName = document.getElementById('customer_name').value;
-                if (!customerName) { 
-                    alert('Tolong isi nama pelanggan dulu, Bang!'); 
-                    return; 
-                }
-                if (this.cart.length === 0) { 
-                    alert('Keranjang masih kosong!'); 
-                    return; 
-                }
-
-                if (this.paymentMethod === 'CASH' && this.cashAmount < this.totalPrice) {
-                    alert('Uang tunai kurang, Bang!');
-                    return;
-                }
-
-                if (!confirm('Selesaikan transaksi atas nama ' + customerName + '?')) return;
-
-                const res = await fetch("{{ route('kasir.store') }}", {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}' 
-                    },
-                    body: JSON.stringify({ 
-                        customer: customerName, 
-                        total_price: this.totalPrice, 
-                        payment_method: this.paymentMethod, 
-                        cash_received: this.cashAmount,
-                        items: this.cart 
-                    })
-                });
-
-                if (res.ok) { 
-                    alert('Transaksi Berhasil!'); 
-                    window.location.reload(); 
-                } else {
-                    alert('Gagal menyimpan transaksi.');
-                }
-            }
-        }
+    const customerName = document.getElementById('customer_name').value;
+    
+    // Validasi Dasar
+    if (!customerName) { 
+        alert('Tolong isi nama pelanggan dulu, Bang!'); 
+        return; 
     }
+    if (this.cart.length === 0) { 
+        alert('Keranjang masih kosong!'); 
+        return; 
+    }
+    if (this.paymentMethod === 'CASH' && this.cashAmount < this.totalPrice) {
+        alert('Uang tunai kurang, Bang!');
+        return;
+    }
+
+    if (!confirm('Selesaikan transaksi atas nama ' + customerName + '?')) return;
+
+    try {
+        const res = await fetch("{{ route('kasir.store') }}", {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json', // WAJIB: Agar Laravel kirim pesan error JSON, bukan halaman HTML
+                'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+            },
+            body: JSON.stringify({ 
+                customer: customerName, 
+                total_price: this.totalPrice, 
+                payment_method: this.paymentMethod, 
+                cash_received: this.cashAmount,
+                items: this.cart // Pastikan ini mengirim array [{id, qty, price}, ...]
+            })
+        });
+
+        const data = await res.json(); // Ambil pesan error dari backend
+
+        if (res.ok) { 
+            alert('Transaksi Berhasil!'); 
+            window.location.reload(); 
+        } else {
+            // Jika gagal, tampilkan pesan error asli dari Controller
+            alert('Gagal: ' + (data.message || 'Terjadi kesalahan sistem'));
+            console.error('Error Detail:', data);
+        }
+    } catch (error) {
+        alert('Koneksi terputus atau server down!');
+        console.error(error);
+    }
+}
+}
 </script>
 </body>
 </html>

@@ -56,30 +56,36 @@ class KasirController extends Controller
 
     public function store(Request $request) {
     try {
-        // Tambahkan logging untuk cek data yang masuk dari frontend
-        \Log::info('Data Checkout:', $request->all());
+        // Cek dulu, datanya masuk gak dari depan?
+        if (!$request->has('items') || empty($request->items)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Keranjang belanja kosong, Bang! Pilih produk dulu.'
+            ], 422);
+        }
 
         return DB::transaction(function () use ($request) {
-            // Simpan ke orders
+            // 1. Simpan ke tabel orders
             $order = \App\Models\Order::create([
-                'customer' => $request->customer,
+                'customer' => $request->customer ?? 'Pelanggan Umum',
                 'total_price' => $request->total_price,
                 'payment_method' => $request->payment_method,
                 'user_id' => auth()->id() ?? 1, 
             ]);
 
+            // 2. Simpan Detail
             foreach ($request->items as $item) {
-                // Pastikan kolom-kolom ini ada di tabel order_details sesuai image_3f1087.png
+                // Pastikan nama key 'id', 'qty', dan 'price' sesuai dengan yang dikirim JS Abang
                 DB::table('order_details')->insert([
                     'order_id'   => $order->id,
                     'product_id' => $item['id'],
                     'quantity'   => $item['qty'],
-                    'price'      => $item['price'] ?? 0, // Ambil harga dari item kiriman frontend
+                    'price'      => $item['price'] ?? 0,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
 
-                // Update Stok
+                // 3. Update Stok (Pakai optional biar gak crash kalau ID produk ngaco)
                 $product = \App\Models\Product::find($item['id']);
                 if ($product) {
                     $product->decrement('stock', $item['qty']);
@@ -87,15 +93,14 @@ class KasirController extends Controller
                 }
             }
 
-            return response()->json(['status' => 'success']);
+            return response()->json(['status' => 'success', 'message' => 'Mantap, Transaksi Berhasil!']);
         });
+
     } catch (\Exception $e) {
-        // INI PENTING: Menampilkan detail error di tab Response Network
+        // Balikin error asli biar kita bisa baca di tab Response
         return response()->json([
             'status' => 'error',
-            'message' => 'Detail Error: ' . $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine()
+            'message' => 'Ada yang meledak: ' . $e->getMessage()
         ], 500);
     }
 }
