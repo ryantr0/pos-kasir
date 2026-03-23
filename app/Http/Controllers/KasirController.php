@@ -55,37 +55,55 @@ class KasirController extends Controller
     }
 
     public function store(Request $request) {
-    // 1. Validasi tetap sama (Ditambahkan validasi payment_method agar aman)
+    // 1. Validasi Input
     $request->validate([
         'customer' => 'required|string|max:255', 
         'total_price' => 'required|numeric',
         'items' => 'required|array',
-        'payment_method' => 'required', // <--- Tambahkan ini agar wajib milih CASH/QRIS
+        'payment_method' => 'required', 
     ]);
 
+    // 2. CEK LOGIN (PENTING!)
+    if (!auth()->check()) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Sesi berakhir, silakan login ulang sebagai kasir!'
+        ], 401);
+    }
+
     try {
-        \DB::transaction(function () use ($request) {
-            // 2. Simpan order dengan tambahan user_id dan payment_method
+        DB::transaction(function () use ($request) {
+            // 3. Simpan ke tabel 'orders'
+            // Pastikan Model Order merujuk ke tabel 'orders'
             $order = \App\Models\Order::create([
                 'customer' => $request->customer, 
                 'total_price' => $request->total_price,
-                'user_id' => auth()->id(), 
-                'payment_method' => $request->payment_method, // <--- INI KUNCINYA: Biar QRIS masuk laporan!
+                'user_id' => auth()->id(), // Sekarang aman karena sudah dicek di atas
+                'payment_method' => $request->payment_method,
             ]);
 
             foreach ($request->items as $item) {
                 $product = \App\Models\Product::find($item['id']);
                 
                 if ($product) {
-                    // 3. Update Stok dan Terjual
+                    // Cek stok cukup gak?
+                    if ($product->stock < $item['qty']) {
+                        throw new \Exception("Stok produk {$product->name} tidak cukup!");
+                    }
+
+                    // 4. Update Stok dan Terjual
                     $product->decrement('stock', $item['qty']); 
                     $product->increment('sold', $item['qty']);
                     
-                    // 4. Simpan ke tabel order_details lewat relasi
-                    $order->items()->create([
+                    // 5. Simpan ke tabel order_details
+                    // NOTE: Pastikan di Model Order sudah ada function items()
+                    DB::table('order_details')->insert([
+                        'order_id'   => $order->id,
                         'product_id' => $product->id,
                         'quantity'   => $item['qty'],
                         'price'      => $product->price,
+                        'created_at' => now(),
+                        'updated_at' => now(),
                     ]);
                 }
             }
@@ -93,13 +111,13 @@ class KasirController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Transaksi Berhasil, data ' . $request->customer . ' sudah tercatat!'
+            'message' => 'Transaksi Berhasil untuk ' . $request->customer
         ]);
 
     } catch (\Exception $e) {
         return response()->json([
             'status' => 'error',
-            'message' => 'Gagal simpan transaksi: ' . $e->getMessage()
+            'message' => 'Gagal: ' . $e->getMessage() // Ini bakal kasih tau error DB aslinya
         ], 500);
     }
 }
