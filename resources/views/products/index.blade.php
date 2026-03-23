@@ -195,7 +195,10 @@
                                 <div class="flex items-center space-x-4">
                                     <div class="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden border border-slate-200">
                                         @if($product->image)
-                                            <img src="{{ asset('storage/' . $product->image) }}" class="w-full h-full object-cover">
+                                            {{-- Kita cek, kalau di database belum ada kata 'products/', kita tambahkan manual --}}
+                                            <img src="{{ Str::contains($product->image, 'products/') ? asset('storage/' . $product->image) : asset('storage/products/' . $product->image) }}" 
+                                                class="w-full h-full object-cover"
+                                                onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($product->name) }}&background=random'">
                                         @else
                                             <div class="w-full h-full flex items-center justify-center text-[10px] text-slate-400 uppercase font-bold">No Img</div>
                                         @endif
