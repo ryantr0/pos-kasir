@@ -9,7 +9,6 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
-        /* Mencegah konten melompat saat sidebar muncul/hilang */
         [x-cloak] { display: none !important; }
     </style>
 </head>
@@ -17,7 +16,7 @@
 <body class="bg-[#f8fafc] antialiased text-slate-900" x-data="{ open: true }">
     <div class="flex min-h-screen relative overflow-hidden">
         
-        {{-- Overlay Mobile --}}
+        {{-- Overlay Mobile (Hanya muncul di layar kecil saat menu buka) --}}
         <div x-show="open" 
              @click="open = false" 
              x-transition.opacity
@@ -25,24 +24,21 @@
              x-cloak>
         </div>
 
-        {{-- Sidebar --}}
+        {{-- Sidebar: Logic diperbaiki agar LG (Laptop) bisa ikut geser --}}
         <aside 
-            :class="open ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0 lg:w-0'"
-            class="fixed inset-y-0 left-0 z-50 flex-shrink-0 border-r border-slate-200 bg-white transition-all duration-300 ease-in-out flex flex-col lg:relative">
+            :class="open ? 'translate-x-0 w-64' : '-translate-x-full lg:-ml-64'"
+            class="fixed inset-y-0 left-0 z-50 flex-shrink-0 border-r border-slate-200 bg-white transition-all duration-300 ease-in-out flex flex-col lg:static">
             
-            {{-- Wrapper Konten Sidebar agar tidak gepeng saat sidebar mengecil di laptop --}}
             <div class="w-64 flex flex-col h-full">
                 <div class="p-8 flex flex-col items-center justify-center text-center border-b border-slate-50">
-                    {{-- Logo Ikonik --}}
                     <div class="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200 mb-4 rotate-3 hover:rotate-0 transition-transform duration-300">
                         <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                         </svg>
                     </div>
 
-                    {{-- Judul --}}
                     <div>
-                        <h1 class="text-xl font-black tracking-tighter text-slate-800 leading-none">WARUNG RZ</h1>
+                        <h1 class="text-xl font-black tracking-tighter text-slate-800 leading-none uppercase">Warung RZ</h1>
                         <div class="flex items-center justify-center space-x-1 mt-2"></div>
                     </div>
                 </div>
@@ -135,7 +131,7 @@
         <main class="flex-1 overflow-y-auto min-w-0 transition-all duration-300">
             <header class="h-20 flex items-center justify-between px-4 lg:px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
                 <div class="flex items-center gap-4">
-                    {{-- Tombol Hamburger (Masing-masing device bisa klik ini) --}}
+                    {{-- Tombol Hamburger (Aktif di Laptop & HP) --}}
                     <button @click="open = !open" class="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-900 hover:text-white transition-all duration-200 focus:outline-none">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
