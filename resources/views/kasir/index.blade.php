@@ -314,8 +314,8 @@
         
         {{-- Gambar QR --}}
         <div class="w-full">
-            <img src="{{ asset('images/IMG_8032.jpg') }}" 
-                 class="w-full h-auto object-contain rounded-2xl shadow-2xl border-4 border-white/10">
+            <img src="{{ asset('images/IMG_8032.JPG') }}" 
+                class="w-full h-auto object-contain rounded-2xl shadow-2xl border-4 border-white/10">
         </div>
 
         {{-- Info Tagihan --}}
