@@ -18,16 +18,16 @@
         
         {{-- Overlay Mobile (Hanya muncul di layar kecil saat menu buka) --}}
         <div x-show="open" 
-             @click="open = false" 
-             x-transition.opacity
-             class="fixed inset-0 bg-slate-900/50 z-40 lg:hidden"
-             x-cloak>
-        </div>
+         @click="open = false" 
+         x-transition.opacity
+         class="fixed inset-0 bg-slate-900/50 z-40 lg:hidden"
+         x-cloak>
+    <   /div>
 
         {{-- Sidebar: Logic diperbaiki agar LG (Laptop) bisa ikut geser --}}
         <aside 
-            :class="open ? 'translate-x-0 w-64' : '-translate-x-full lg:-ml-64'"
-            class="fixed inset-y-0 left-0 z-50 flex-shrink-0 border-r border-slate-200 bg-white transition-all duration-300 ease-in-out flex flex-col lg:static">
+            :class="open ? 'w-64' : 'w-0 lg:-ml-64'"
+            class="fixed lg:relative inset-y-0 left-0 z-50 flex-shrink-0 border-r border-slate-200 bg-white transition-all duration-300 ease-in-out flex flex-col overflow-hidden">s="fixed inset-y-0 left-0 z-50 flex-shrink-0 border-r border-slate-200 bg-white transition-all duration-300 ease-in-out flex flex-col lg:static">
             
             <div class="w-64 flex flex-col h-full">
                 <div class="p-8 flex flex-col items-center justify-center text-center border-b border-slate-50">
