@@ -230,24 +230,20 @@
             </div>
         </main>
 
-     <div x-data="{ showCart: true }" class="relative flex min-h-screen bg-slate-100 overflow-hidden">
+     <div x-data="{ showSidebar: true, ... }" class="relative flex">
 
     <button 
-        x-show="!showCart" 
-        @click="showCart = true"
-        x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 scale-90"
-        x-transition:enter-end="opacity-100 scale-100"
-        class="fixed right-6 bottom-6 z-50 flex items-center justify-center w-14 h-14 bg-slate-900 text-white rounded-full shadow-2xl hover:bg-slate-800 transition-all active:scale-95"
+        x-show="!showSidebar"
+        @click="showSidebar = true"
+        class="fixed right-4 top-4 z-50 p-3 bg-slate-900 text-white rounded-full shadow-2xl hover:scale-110 transition-transform"
     >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
         </svg>
-        <span class="absolute -top-1 -right-1 bg-red-500 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white" x-text="cart.length"></span>
     </button>
 
     <aside 
-        x-show="showCart"
+        x-show="showSidebar"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="translate-x-full"
         x-transition:enter-end="translate-x-0"
@@ -258,8 +254,8 @@
     >
         <div class="p-5 border-b border-slate-50">
             <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <button @click="showCart = false" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 transition-colors">
+                <div class="flex items-center space-x-2">
+                    <button @click="showSidebar = false" class="p-1 hover:bg-slate-100 rounded text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -287,7 +283,9 @@
             
             <template x-if="cart.length === 0">
                 <div class="h-full flex flex-col items-center justify-center opacity-20 py-20">
-                    <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
                     <p class="text-[8px] font-bold uppercase tracking-widest">Belum ada pesanan</p>
                 </div>
             </template>
