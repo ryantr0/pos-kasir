@@ -329,59 +329,83 @@
                 </div>
             </div>
 
-            <div x-trap.inert.noscope="showQrisModal" 
-                 x-show="showQrisModal" 
-                 x-cloak 
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0 backdrop-blur-none"
-                 x-transition:enter-end="opacity-100 backdrop-blur-[2px]"
-                 x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="opacity-100 backdrop-blur-[2px]"
-                 x-transition:leave-end="opacity-0 backdrop-blur-none"
-                 @keydown.escape.window="showQrisModal = false"
-                 role="dialog" aria-modal="true" aria-labelledby="qris-title"
-                 class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-                 @click.self="showQrisModal = false"
-                 x-effect="showQrisModal ? document.body.classList.add('overflow-hidden') : document.body.classList.remove('overflow-hidden')">
-                <div class="w-full max-w-sm bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 max-h-[90vh] overflow-hidden pointer-events-auto animate-in fade-in zoom-in duration-200" id="qris-content">
-                    <div class="p-6 pb-2 flex items-center justify-between">
-                        <h2 id="qris-title" class="text-lg font-black text-slate-900 uppercase tracking-tighter">QRIS Payment</h2>
-                        <button @click="showQrisModal = false" class="p-1.5 rounded-xl hover:bg-slate-100 transition-all text-slate-500 hover:text-slate-900">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="p-6 space-y-6">
-                        <div class="flex items-center justify-center p-4 bg-gradient-to-b from-slate-50 to-white rounded-2xl border-2 border-slate-100 shadow-inner">
-                            <img src="{{ asset('images/IMG_8032.JPG') }}" alt="QRIS Warung RZ" class="w-48 h-48 object-contain rounded-xl shadow-xl" loading="lazy">
-                        </div>
-                        <div class="text-center space-y-2 pt-2">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Tagihan</p>
-                            <div class="p-4 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl border border-emerald-100">
-                                <div class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight" x-text="'Rp ' + totalPrice.toLocaleString('id-ID')"></div>
-                            </div>
-                        </div>
-                        <button @click="showQrisModal = false; paymentMethod = 'CASH'" class="w-full py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-wider shadow-xl hover:shadow-2xl active:scale-[0.98] transition-all duration-200">✓ Selesai Bayar</button>
-                        <p class="text-center text-xs font-bold text-slate-500 uppercase tracking-wider pt-2">Terima Kasih - Warung RZ</p>
-                    </div>
-                </div>
-            </div>
+<div x-trap.inert.noscope="showQrisModal" 
+     x-show="showQrisModal" 
+     x-cloak 
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0 backdrop-blur-none"
+     x-transition:enter-end="opacity-100 backdrop-blur-[2px]"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100 backdrop-blur-[2px]"
+     x-transition:leave-end="opacity-0 backdrop-blur-none"
+     @keydown.escape.window="showQrisModal = false"
+     role="dialog" aria-modal="true" aria-labelledby="qris-title"
+     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+     @click.self="showQrisModal = false"
+     x-effect="showQrisModal ? document.body.classList.add('overflow-hidden') : document.body.classList.remove('overflow-hidden')">
 
-            <div class="pt-2 border-t border-slate-50">
-                <div class="flex justify-between items-center mb-4">
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Total Bayar</p>
-                    <p class="text-base font-black text-slate-900 tracking-tighter" x-text="'Rp' + totalPrice.toLocaleString()"></p>
-                </div>
-
-                <button @click="checkout()" :disabled="cart.length === 0 || (paymentMethod === 'CASH' && (cashAmount < totalPrice || cashAmount === 0))"
-                    class="w-full py-3 bg-slate-900 text-white rounded-lg font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-slate-800 transition disabled:opacity-20 active:scale-95">
-                    Proses Checkout
-                </button>
-            </div>
+    <div class="w-full max-w-sm bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 max-h-[90vh] overflow-hidden pointer-events-auto animate-in fade-in zoom-in duration-200" 
+         id="qris-content">
+        
+        <!-- Header dengan Close Button -->
+        <div class="p-6 pb-2 flex items-center justify-between">
+            <h2 id="qris-title" class="text-lg font-black text-slate-900 uppercase tracking-tighter">QRIS Payment</h2>
+            <button @click="showQrisModal = false" 
+                    class="p-1.5 rounded-xl hover:bg-slate-100 transition-all text-slate-500 hover:text-slate-900"
+                    aria-label="Close QRIS modal">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
         </div>
-    </aside>
+
+        <div class="p-6 space-y-6">
+            <!-- QR Code -->
+            <div class="flex items-center justify-center p-4 bg-gradient-to-b from-slate-50 to-white rounded-2xl border-2 border-slate-100 shadow-inner">
+                <img src="{{ asset('images/IMG_8032.JPG') }}" 
+                     alt="QRIS Warung RZ" 
+                     class="w-48 h-48 object-contain rounded-xl shadow-xl"
+                     loading="lazy">
+            </div>
+
+            <!-- Payment Info -->
+            <div class="text-center space-y-2 pt-2">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Tagihan</p>
+                <div class="p-4 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl border border-emerald-100">
+                    <div class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight" 
+                         x-text="'Rp ' + totalPrice.toLocaleString('id-ID')">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <button @click="showQrisModal = false; paymentMethod = 'CASH'" 
+                    class="w-full py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-wider shadow-xl hover:shadow-2xl active:scale-[0.98] transition-all duration-200"
+                    aria-label="Complete QRIS payment">
+                ✓ Selesai Bayar
+            </button>
+
+            <!-- Footer -->
+            <p class="text-center text-xs font-bold text-slate-500 uppercase tracking-wider pt-2">Terima Kasih - Warung RZ</p>
+        </div>
+    </div>
 </div>
+
+                <div class="pt-2 border-t border-slate-50">
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="text-[9px] text-slate-400 font-bold uppercase">Total Bayar</p>
+                        <p class="text-base font-black text-slate-900 tracking-tighter" x-text="'Rp' + totalPrice.toLocaleString()"></p>
+                    </div>
+
+                    {{-- PERBAIKAN DI SINI: Huruf kecil 'cash' diganti jadi 'CASH' agar sinkron --}}
+                    <button @click="checkout()" :disabled="cart.length === 0 || (paymentMethod === 'CASH' && (cashAmount < totalPrice || cashAmount === 0))"
+                        class="w-full py-3 bg-slate-900 text-white rounded-lg font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-slate-800 transition disabled:opacity-20 active:scale-95">
+                        Proses Checkout
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </div>
 
 <script>
     function filterProducts() {
