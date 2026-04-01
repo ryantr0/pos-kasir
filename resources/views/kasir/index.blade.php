@@ -230,125 +230,158 @@
             </div>
         </main>
 
-        <aside class="w-80 bg-white border-l border-slate-200 flex flex-col shadow-xl z-20">
-            <div class="p-5 border-b border-slate-50">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-[11px] font-black text-slate-900 uppercase tracking-widest">Order Summary</h3>
-                    <span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded" x-text="cart.length + ' Items'"></span>
-                </div>
-            </div>
+     <div x-data="{ showCart: true }" class="relative flex min-h-screen bg-slate-100 overflow-hidden">
 
-            <div class="flex-1 overflow-y-auto p-4 space-y-2 custom-scroll">
-                <template x-for="item in cart" :key="item.id">
-                    <div class="flex justify-between items-center p-2 rounded-lg bg-slate-50/50 border border-slate-100">
-                        <div class="flex-1 min-w-0 pr-2">
-                            <p class="text-[9px] font-bold text-slate-700 uppercase truncate" x-text="item.name"></p>
-                            <p class="text-[10px] text-slate-900 font-black mt-0.5" x-text="'Rp' + (item.price * item.qty).toLocaleString()"></p>
-                        </div>
-                        <div class="flex items-center space-x-1.5">
-                            <button @click="updateQty(item.id, -1)" class="w-5 h-5 flex items-center justify-center rounded bg-white border border-slate-200 text-slate-400 hover:text-red-500 font-bold text-[10px]">-</button>
-                            <span class="text-[10px] font-black w-3 text-center" x-text="item.qty"></span>
-                            <button @click="updateQty(item.id, 1)" class="w-5 h-5 flex items-center justify-center rounded bg-white border border-slate-200 text-slate-400 hover:text-emerald-500 font-bold text-[10px]">+</button>
-                        </div>
-                    </div>
-                </template>
-                
-                <template x-if="cart.length === 0">
-                    <div class="h-full flex flex-col items-center justify-center opacity-20 py-20">
-                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        <p class="text-[8px] font-bold uppercase tracking-widest">Belum ada pesanan</p>
-                    </div>
-                </template>
-            </div>
-
-            <div class="p-5 bg-white border-t border-slate-100 space-y-4">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">Nama Pelanggan</label>
-                    <input type="text" id="customer_name" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-slate-900 focus:outline-none transition shadow-sm" placeholder="Input Nama...">
-                </div>
-
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">Metode Bayar</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button type="button" 
-                            @click.prevent="paymentMethod = 'CASH'; cashAmount = 0" 
-                            :class="paymentMethod === 'CASH' ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-white text-slate-600 border-slate-200'" 
-                            class="py-2 px-4 border rounded-lg text-[10px] font-bold transition-all">
-                            CASH
-                        </button>
-
-                        <button type="button" 
-                            @click.prevent="paymentMethod = 'QRIS'; showQrisModal = true; cashAmount = totalPrice" 
-                            :class="paymentMethod === 'QRIS' ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-white text-slate-600 border-slate-200'" 
-                            class="py-2 px-4 border rounded-lg text-[10px] font-bold transition-all">
-                            QRIS
-                        </button>
-                    </div>
-                </div>
-
-                <div x-show="paymentMethod === 'CASH'" x-transition class="space-y-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                    <div>
-                        <label class="text-[9px] font-bold text-slate-500 uppercase">Uang Tunai</label>
-                        <input type="number" x-model.number="cashAmount" @input="calculateChange" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-slate-900" placeholder="0">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase">Kembalian</span>
-                        <span class="text-xs font-black" :class="changeAmount < 0 ? 'text-red-500' : 'text-emerald-600'" x-text="'Rp' + changeAmount.toLocaleString()"></span>
-                    </div>
-                </div>
-
-                
-<div x-show="showQrisModal" x-cloak x-transition
-    {{-- Di sini kuncinya: bg-black/40 bikin background belakang tetap kelihatan (transparan) --}}
-    class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px]" 
-    @click.self="showQrisModal = false">
-    
-    {{-- Tombol Close --}}
-    <button @click="showQrisModal = false" class="absolute top-6 right-6 text-white/50 hover:text-white transition-colors">
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+    <button 
+        x-show="!showCart" 
+        @click="showCart = true"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 scale-90"
+        x-transition:enter-end="opacity-100 scale-100"
+        class="fixed right-6 bottom-6 z-50 flex items-center justify-center w-14 h-14 bg-slate-900 text-white rounded-full shadow-2xl hover:bg-slate-800 transition-all active:scale-95"
+    >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
         </svg>
+        <span class="absolute -top-1 -right-1 bg-red-500 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white" x-text="cart.length"></span>
     </button>
 
-    <div class="flex flex-col items-center justify-center space-y-6 w-full max-w-sm px-6">
-        
-        {{-- Gambar QR --}}
-        <div class="w-full">
-            <img src="{{ asset('images/IMG_8032.JPG') }}" 
-                class="w-full h-auto object-contain rounded-2xl shadow-2xl border-4 border-white/10">
+    <aside 
+        x-show="showCart"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="translate-x-full"
+        x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="translate-x-0"
+        x-transition:leave-end="translate-x-full"
+        class="fixed right-0 top-0 h-full w-80 bg-white border-l border-slate-200 flex flex-col shadow-xl z-40"
+    >
+        <div class="p-5 border-b border-slate-50">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <button @click="showCart = false" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                    <h3 class="text-[11px] font-black text-slate-900 uppercase tracking-widest">Order Summary</h3>
+                </div>
+                <span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded" x-text="cart.length + ' Items'"></span>
+            </div>
         </div>
 
-        {{-- Info Tagihan --}}
-        <div class="text-center ">
-            <p class="text-[10px] font-bold text-white/60 uppercase tracking-widest mb-1">Total Pembayaran</p>
-            <h3 class="text-3xl font-black text-white" x-text="'Rp' + totalPrice.toLocaleString()"></h3>
-        </div>
-
-        {{-- Button Selesai --}}
-        <button @click="showQrisModal = false" 
-                class="w-full py-4 bg-white text-slate-900 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg">
-            Selesai Scan
-        </button>
-        
-        <p class="text-[10px] font-bold text-white/40 uppercase tracking-[0.4em]">Warung RZ</p>
-    </div>
-</div>
-
-                <div class="pt-2 border-t border-slate-50">
-                    <div class="flex justify-between items-center mb-4">
-                        <p class="text-[9px] text-slate-400 font-bold uppercase">Total Bayar</p>
-                        <p class="text-base font-black text-slate-900 tracking-tighter" x-text="'Rp' + totalPrice.toLocaleString()"></p>
+        <div class="flex-1 overflow-y-auto p-4 space-y-2 custom-scroll">
+            <template x-for="item in cart" :key="item.id">
+                <div class="flex justify-between items-center p-2 rounded-lg bg-slate-50/50 border border-slate-100">
+                    <div class="flex-1 min-w-0 pr-2">
+                        <p class="text-[9px] font-bold text-slate-700 uppercase truncate" x-text="item.name"></p>
+                        <p class="text-[10px] text-slate-900 font-black mt-0.5" x-text="'Rp' + (item.price * item.qty).toLocaleString()"></p>
                     </div>
+                    <div class="flex items-center space-x-1.5">
+                        <button @click="updateQty(item.id, -1)" class="w-5 h-5 flex items-center justify-center rounded bg-white border border-slate-200 text-slate-400 hover:text-red-500 font-bold text-[10px]">-</button>
+                        <span class="text-[10px] font-black w-3 text-center" x-text="item.qty"></span>
+                        <button @click="updateQty(item.id, 1)" class="w-5 h-5 flex items-center justify-center rounded bg-white border border-slate-200 text-slate-400 hover:text-emerald-500 font-bold text-[10px]">+</button>
+                    </div>
+                </div>
+            </template>
+            
+            <template x-if="cart.length === 0">
+                <div class="h-full flex flex-col items-center justify-center opacity-20 py-20">
+                    <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    <p class="text-[8px] font-bold uppercase tracking-widest">Belum ada pesanan</p>
+                </div>
+            </template>
+        </div>
 
-                    {{-- PERBAIKAN DI SINI: Huruf kecil 'cash' diganti jadi 'CASH' agar sinkron --}}
-                    <button @click="checkout()" :disabled="cart.length === 0 || (paymentMethod === 'CASH' && (cashAmount < totalPrice || cashAmount === 0))"
-                        class="w-full py-3 bg-slate-900 text-white rounded-lg font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-slate-800 transition disabled:opacity-20 active:scale-95">
-                        Proses Checkout
+        <div class="p-5 bg-white border-t border-slate-100 space-y-4">
+            <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">Nama Pelanggan</label>
+                <input type="text" id="customer_name" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-slate-900 focus:outline-none transition shadow-sm" placeholder="Input Nama...">
+            </div>
+
+            <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">Metode Bayar</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button" 
+                        @click.prevent="paymentMethod = 'CASH'; cashAmount = 0" 
+                        :class="paymentMethod === 'CASH' ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-white text-slate-600 border-slate-200'" 
+                        class="py-2 px-4 border rounded-lg text-[10px] font-bold transition-all">
+                        CASH
+                    </button>
+
+                    <button type="button" 
+                        @click.prevent="paymentMethod = 'QRIS'; showQrisModal = true; cashAmount = totalPrice" 
+                        :class="paymentMethod === 'QRIS' ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-white text-slate-600 border-slate-200'" 
+                        class="py-2 px-4 border rounded-lg text-[10px] font-bold transition-all">
+                        QRIS
                     </button>
                 </div>
             </div>
-        </aside>
-    </div>
+
+            <div x-show="paymentMethod === 'CASH'" x-transition class="space-y-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <div>
+                    <label class="text-[9px] font-bold text-slate-500 uppercase">Uang Tunai</label>
+                    <input type="number" x-model.number="cashAmount" @input="calculateChange" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-slate-900" placeholder="0">
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-[9px] font-bold text-slate-400 uppercase">Kembalian</span>
+                    <span class="text-xs font-black" :class="changeAmount < 0 ? 'text-red-500' : 'text-emerald-600'" x-text="'Rp' + changeAmount.toLocaleString()"></span>
+                </div>
+            </div>
+
+            <div x-trap.inert.noscope="showQrisModal" 
+                 x-show="showQrisModal" 
+                 x-cloak 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 backdrop-blur-none"
+                 x-transition:enter-end="opacity-100 backdrop-blur-[2px]"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 backdrop-blur-[2px]"
+                 x-transition:leave-end="opacity-0 backdrop-blur-none"
+                 @keydown.escape.window="showQrisModal = false"
+                 role="dialog" aria-modal="true" aria-labelledby="qris-title"
+                 class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+                 @click.self="showQrisModal = false"
+                 x-effect="showQrisModal ? document.body.classList.add('overflow-hidden') : document.body.classList.remove('overflow-hidden')">
+                <div class="w-full max-w-sm bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 max-h-[90vh] overflow-hidden pointer-events-auto animate-in fade-in zoom-in duration-200" id="qris-content">
+                    <div class="p-6 pb-2 flex items-center justify-between">
+                        <h2 id="qris-title" class="text-lg font-black text-slate-900 uppercase tracking-tighter">QRIS Payment</h2>
+                        <button @click="showQrisModal = false" class="p-1.5 rounded-xl hover:bg-slate-100 transition-all text-slate-500 hover:text-slate-900">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        <div class="flex items-center justify-center p-4 bg-gradient-to-b from-slate-50 to-white rounded-2xl border-2 border-slate-100 shadow-inner">
+                            <img src="{{ asset('images/IMG_8032.JPG') }}" alt="QRIS Warung RZ" class="w-48 h-48 object-contain rounded-xl shadow-xl" loading="lazy">
+                        </div>
+                        <div class="text-center space-y-2 pt-2">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Tagihan</p>
+                            <div class="p-4 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl border border-emerald-100">
+                                <div class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight" x-text="'Rp ' + totalPrice.toLocaleString('id-ID')"></div>
+                            </div>
+                        </div>
+                        <button @click="showQrisModal = false; paymentMethod = 'CASH'" class="w-full py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-wider shadow-xl hover:shadow-2xl active:scale-[0.98] transition-all duration-200">✓ Selesai Bayar</button>
+                        <p class="text-center text-xs font-bold text-slate-500 uppercase tracking-wider pt-2">Terima Kasih - Warung RZ</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-50">
+                <div class="flex justify-between items-center mb-4">
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Total Bayar</p>
+                    <p class="text-base font-black text-slate-900 tracking-tighter" x-text="'Rp' + totalPrice.toLocaleString()"></p>
+                </div>
+
+                <button @click="checkout()" :disabled="cart.length === 0 || (paymentMethod === 'CASH' && (cashAmount < totalPrice || cashAmount === 0))"
+                    class="w-full py-3 bg-slate-900 text-white rounded-lg font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-slate-800 transition disabled:opacity-20 active:scale-95">
+                    Proses Checkout
+                </button>
+            </div>
+        </div>
+    </aside>
+</div>
 
 <script>
     function filterProducts() {
