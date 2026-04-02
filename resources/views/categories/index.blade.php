@@ -8,7 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
-<body class="bg-[#f8fafc] antialiased text-slate-900" x-data="Object.assign(posSystem(), { open: false })">
+<body class="bg-[#f8fafc] antialiased text-slate-900">
+
+    <body class="bg-[#f8fafc] antialiased text-slate-900" x-data="{ open: false }">
     <div class="flex min-h-screen overflow-hidden">
         
         <aside 
@@ -122,35 +124,37 @@
                 @endif
             </nav>
 
-        </aside>
-        <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
-                <div>
-                    <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">kategori</h2>
-                    <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
+
+        
+    </aside>
+
+    <main class="flex-1 overflow-y-auto">
+        <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+            <div>
+                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Daftar produk</h2>
+                <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
+            </div>
+
+ 
+
+
+
+            <div class="flex items-center space-x-3">              
+                <div class="hidden md:flex flex-col items-end border-r border-slate-200 pr-3">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Hari ini</span>
+                    <span id="realtime-date" class="text-[11px] font-extrabold text-slate-700 uppercase">
+                        {{ date('l, d M Y') }} {{-- Tetap ada buat tampilan awal --}}
+                    </span>
                 </div>
 
-                <div class="flex items-center space-x-3">              
-                    <div class="hidden md:flex flex-col items-end border-r border-slate-200 pr-3">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Hari ini</span>
-                        <span id="realtime-date" class="text-[11px] font-extrabold text-slate-700 uppercase">
-                            {{ date('l, d M Y') }}
-                        </span>
-                    </div>
-
-                    <div class="bg-slate-900 px-4 py-2 rounded-xl shadow-lg shadow-slate-200 flex items-center space-x-2 border border-slate-800">
-                        <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                        <span id="realtime-clock" class="text-sm font-black text-white tabular-nums tracking-widest">
-                            00:00:00
-                        </span>
-                    </div>
+                <div class="bg-slate-900 px-4 py-2 rounded-xl shadow-lg shadow-slate-200 flex items-center space-x-2 border border-slate-800">
+                    <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <span id="realtime-clock" class="text-sm font-black text-white tabular-nums tracking-widest">
+                        00:00:00
+                    </span>
                 </div>
-             </header>
-
-            
-
-            
-        </aside>
+            </div>
+        </header>
 
         <div class="p-8">
             @if(session('success'))
