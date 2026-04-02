@@ -130,35 +130,9 @@
                 @endif
             </nav>
 
+   
         </aside>
-        <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
-                <div>
-                    <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Kasir</h2>
-                    <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
-                </div>
-
-                <div class="flex items-center space-x-3">              
-                    <div class="hidden md:flex flex-col items-end border-r border-slate-200 pr-3">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Hari ini</span>
-                        <span id="realtime-date" class="text-[11px] font-extrabold text-slate-700 uppercase">
-                            {{ date('l, d M Y') }}
-                        </span>
-                    </div>
-
-                    <div class="bg-slate-900 px-4 py-2 rounded-xl shadow-lg shadow-slate-200 flex items-center space-x-2 border border-slate-800">
-                        <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                        <span id="realtime-clock" class="text-sm font-black text-white tabular-nums tracking-widest">
-                            00:00:00
-                        </span>
-                    </div>
-                </div>
-             </header>
-
-            
-
-            
-        </aside>
+        
         <main class="flex-1 flex flex-col bg-[#fcfcfc] min-w-0">
             <div class="p-6 overflow-y-auto custom-scroll">
                 <div class="mb-8 space-y-4">
@@ -273,18 +247,29 @@
      <div x-data="{ showCart: false }" class="relative flex min-h-screen bg-slate-100 overflow-hidden">
 
     <button 
-        x-show="!showCart" 
-        @click="showCart = true"
-        x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 scale-90"
-        x-transition:enter-end="opacity-100 scale-100"
-        class="fixed right-6 bottom-6 z-50 flex items-center justify-center w-14 h-14 bg-slate-900 text-white rounded-full shadow-2xl hover:bg-slate-800 transition-all active:scale-95"
-    >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    x-show="!showCart" 
+    @click="showCart = true"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 scale-90"
+    x-transition:enter-end="opacity-100 scale-100"
+    class="fixed right-6 bottom-6 z-50 flex items-center justify-center w-14 h-14 bg-slate-900 text-white rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:bg-slate-800 transition-all active:scale-95 group"
+>
+    <div class="relative">
+        <svg class="w-6 h-6 transition-transform group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
         </svg>
-        <span class="absolute -top-1 -right-1 bg-red-500 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white" x-text="cart.length"></span>
-    </button>
+
+        <span 
+            x-show="cart.length > 0"
+            x-transition:enter="transition cubic-bezier(0.175, 0.885, 0.32, 1.275) duration-500"
+            x-transition:enter-start="scale-0"
+            x-transition:enter-end="scale-100"
+            class="absolute -top-3 -right-3 bg-red-600 text-white text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-full 
+                   border-[2.5px] border-white shadow-lg shadow-red-500/40 ring-1 ring-red-500/10 isolate"
+            x-text="cart.length">
+        </span>
+    </div>
+</button>
 
  <aside 
     x-show="showCart"
@@ -424,11 +409,14 @@
             </div>
 
             <!-- Action Button -->
-            <button @click="showQrisModal = false; paymentMethod = 'CASH'" 
-                    class="w-full py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-wider shadow-xl hover:shadow-2xl active:scale-[0.98] transition-all duration-200"
-                    aria-label="Complete QRIS payment">
-                ✓ Selesai Bayar
-            </button>
+            <div class="space-y-3">
+    <button @click="showQrisModal = false" 
+            class="w-full py-3 bg-slate-100 text-slate-500 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-200 transition-all">
+        Selesai Bayar
+    </button>
+    
+    
+</div>
 
             <!-- Footer -->
             <p class="text-center text-xs font-bold text-slate-500 uppercase tracking-wider pt-2">Terima Kasih - Warung RZ</p>
