@@ -135,18 +135,7 @@
                 <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
             </div>
 
-            {{-- SEARCH BAR BARU --}}
-    <div class="flex-1 max-w-md mx-8">
-        <div class="relative group">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                <svg class="w-4 h-4 text-slate-400 group-focus-within:text-slate-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-            </span>
-            <input type="text" id="productSearch" placeholder="Cari nama produk atau kategori..." 
-                class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium outline-none focus:border-slate-900 focus:bg-white transition-all">
-        </div>
-    </div>
+  
 
 
 
