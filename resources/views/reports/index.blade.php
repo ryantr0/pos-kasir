@@ -453,66 +453,140 @@
     </div>
 </div>
 
-{{-- TABEL PRODUK TERJUAL (VERSI RAMPING) --}}
-<div class="max-w-md bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-8" 
-     x-data="{ limit: 5, total: {{ $soldProducts->count() }} }">
-    
-    <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-        <h3 class="text-[11px] font-black text-slate-800 uppercase tracking-tight">
-            📦 Produk Terjual
-        </h3>
-        <span class="text-[9px] font-bold bg-slate-900 text-white px-1.5 py-0.5 rounded">LIVE</span>
-    </div>
+{{-- Container Utama: Flexbox untuk menaruh tabel di kiri dan radar di kanan --}}
+<div class="flex flex-col lg:flex-row gap-6 items-start w-full">
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-[12px]">
-            <thead class="bg-slate-50 text-[9px] uppercase font-bold text-slate-400">
-                <tr>
-                    <th class="px-4 py-2">Produk</th>
-                    <th class="px-4 py-2">Kategori</th>
-                    <th class="px-4 py-2 text-center">Qty</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                @forelse($soldProducts as $index => $sold)
-                <tr class="hover:bg-slate-50/50 transition" x-show="{{ $index }} < limit">
-                    <td class="px-4 py-2.5 font-bold text-slate-700 leading-tight">
-                        {{ $sold->product->name ?? 'Dihapus' }}
-                    </td>
-                    <td class="px-4 py-2.5 text-slate-400 text-[10px]">
-                        {{ $sold->product->category->name ?? '-' }}
-                    </td>
-                    <td class="px-4 py-2.5 text-center">
-                        <span class="text-emerald-700 font-bold">
-                            {{ $sold->total_qty }}
-                        </span>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="3" class="p-4 text-center text-slate-400 italic text-xs">Kosong</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+    {{-- KOLOM KIRI: TABEL PRODUK TERJUAL --}}
+    <div class="flex-1 w-full lg:max-w-md">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-8" 
+             x-data="{ limit: 5, total: {{ $soldProducts->count() }} }">
+            
+            <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <h3 class="text-[11px] font-black text-slate-800 uppercase tracking-tight">
+                    📦 Produk Terjual
+                </h3>
+                <span class="text-[9px] font-bold bg-slate-900 text-white px-1.5 py-0.5 rounded">LIVE</span>
+            </div>
 
-    @if($soldProducts->count() > 5)
-    <div class="px-4 py-2 border-t border-slate-100 bg-slate-50/30 flex justify-center gap-4">
-        <button x-show="limit < total" @click="limit += 5" 
-                class="text-[10px] font-bold text-indigo-600 hover:underline">
-            Lainnya ↓
-        </button>
-        <button x-show="limit > 5" @click="limit = 5" 
-                class="text-[10px] font-bold text-slate-400 hover:underline">
-            Sembunyi ↑
-        </button>
-    </div>
-    @endif
-</div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-[12px]">
+                    <thead class="bg-slate-50 text-[9px] uppercase font-bold text-slate-400">
+                        <tr>
+                            <th class="px-4 py-2">Produk</th>
+                            <th class="px-4 py-2">Kategori</th>
+                            <th class="px-4 py-2 text-center">Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse($soldProducts as $index => $sold)
+                        <tr class="hover:bg-slate-50/50 transition" x-show="{{ $index }} < limit">
+                            <td class="px-4 py-2.5 font-bold text-slate-700 leading-tight">
+                                {{ $sold->product->name ?? 'Dihapus' }}
+                            </td>
+                            <td class="px-4 py-2.5 text-slate-400 text-[10px]">
+                                {{ $sold->product->category->name ?? '-' }}
+                            </td>
+                            <td class="px-4 py-2.5 text-center">
+                                <span class="text-emerald-700 font-bold">
+                                    {{ $sold->total_qty }}
+                                </span>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="3" class="p-4 text-center text-slate-400 italic text-xs">Kosong</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if($soldProducts->count() > 5)
+            <div class="px-4 py-2 border-t border-slate-100 bg-slate-50/30 flex justify-center gap-4">
+                <button x-show="limit < total" @click="limit += 5" 
+                        class="text-[10px] font-bold text-indigo-600 hover:underline">
+                    Lainnya ↓
+                </button>
+                <button x-show="limit > 5" @click="limit = 5" 
+                        class="text-[10px] font-bold text-slate-400 hover:underline">
+                    Sembunyi ↑
+                </button>
+            </div>
+            @endif
         </div>
-    </main>
-</div>
+    </div>
+
+    {{-- KOLOM KANAN: RADAR RESTOCK --}}
+    <div class="w-full lg:w-[400px]">
+        <div x-data="{ open: false }" class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-fit self-start w-full lg:w-[400px]">
+            {{-- Header Lega --}}
+            <div class="px-3 py-4 border-b border-slate-100 flex items-center justify-between bg-rose-50/20">
+                <h3 class="text-xs font-black text-rose-600 uppercase tracking-widest flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    Radar Restock
+                </h3>
+                <a href="{{ route('reports.downloadRestock') }}" class="p-1.5 bg-rose-600 text-white rounded hover:bg-rose-700 transition shadow-sm" title="Download PDF Restock">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </a>
+                <span class="px-2 py-1 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-md uppercase">
+                    ≤ 5
+                </span>
+            </div>
+            
+            {{-- Container List --}}
+            <div class="p-4 space-y-3">
+                @forelse($stokMenipis as $index => $item)
+                    <div x-show="open || {{ $index }} < 5" 
+                         x-transition
+                         class="flex items-center justify-between p-3 rounded-lg border border-slate-50 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-100 transition-all group">
+                        
+                        <div class="flex items-center space-x-3.5 overflow-hidden">
+                            <div class="w-10 h-10 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-300 group-hover:text-rose-500 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                            </div>
+                            <div class="leading-tight overflow-hidden">
+                                <p class="text-sm font-black text-slate-800 uppercase truncate max-w-xs group-hover:text-rose-700">{{ $item->name }}</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Stok Saat Ini</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3 text-right">
+                            <div class="text-right">
+                                <p class="text-lg font-black text-rose-600 tabular-nums">{{ $item->stock }}</p>
+                                <p class="text-[9px] text-slate-500 font-medium -mt-1 uppercase tracking-wider">Unit</p>
+                            </div>
+                            <a href="{{ route('products.edit', $item->id) }}" class="text-[9px] font-black text-slate-500 hover:text-white hover:bg-slate-900 uppercase border border-slate-200 px-3 py-1.5 rounded-lg bg-white shadow-sm transition-all group-hover:scale-105 active:scale-95">
+                                RESTOCK
+                            </a>
+                        </div>
+                    </div>
+                @empty
+                    <div class="py-10 text-center bg-slate-50 rounded-lg border-2 border-dashed border-slate-100">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] italic">Stock Tidak Ada Yang Kosong !</p>
+                    </div>
+                @endforelse
+
+                @if(count($stokMenipis) > 5)
+                    <button @click="open = !open" class="w-full mt-2 py-3 border-t border-slate-100 text-[10px] font-black text-slate-400 hover:text-slate-900 transition-all uppercase tracking-[0.3em] flex items-center justify-center space-x-2">
+                        <span x-text="open ? 'SEMBUNYIKAN' : 'LIHAT SEMUA ({{ count($stokMenipis) - 5 }} LAGI)'"></span>
+                        <svg class="w-3 h-3 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    
+
+</div> {{-- Penutup Container Flex --}}
+
+
 
 
 

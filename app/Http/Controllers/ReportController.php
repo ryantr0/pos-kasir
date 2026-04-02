@@ -94,6 +94,9 @@ class ReportController extends Controller
         return strtoupper(trim($order->payment_method)) === 'CASH';
     })->sum('total_price');
 
+    // Ambil data stok menipis (Radar Restock)
+    $stokMenipis = \App\Models\Product::where('stock', '<=', 5)->get();
+
     // 6. Lempar SEMUA data ke Blade
     return view('reports.index', [
         'orders' => $orders,
@@ -106,7 +109,8 @@ class ReportController extends Controller
         'filter' => $filter,
         'revenueDetails' => $orders,
         'expenseDetails' => $expenseDetails,
-        'soldProducts' => $soldProducts
+        'soldProducts' => $soldProducts,
+        'stokMenipis' => $stokMenipis,
     ]);
 }
 
@@ -169,5 +173,21 @@ public function downloadPDF(Request $request)
 
         return $pdf->download($fileName);
     }
+
+    public function downloadRestockPDF()
+{
+    // Ambil data stok menipis saja
+    $stokMenipis = \App\Models\Product::where('stock', '<=', 5)
+                    ->with('category')
+                    ->orderBy('stock', 'asc')
+                    ->get();
+
+    $dateString = now()->format('d-m-Y');
+    $fileName = 'Laporan-Radar-Restock-' . $dateString . '.pdf';
+
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.pdf_restock', compact('stokMenipis'));
+
+    return $pdf->download($fileName);
+}
 
 }

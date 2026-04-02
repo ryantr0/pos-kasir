@@ -91,6 +91,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/laporan', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/laporan/pdf', [ReportController::class, 'downloadPDF'])->name('reports.pdf');
     Route::resource('expenses', ExpenseController::class);
+    Route::get('/laporan/download-restock', [App\Http\Controllers\ReportController::class, 'downloadRestockPDF'])->name('reports.downloadRestock');
     
 
     // PROFILE SETTINGS
