@@ -12,9 +12,10 @@
 
 <body class="bg-[#f8fafc] antialiased text-slate-900" x-data="{ open: false }">
     <div class="flex min-h-screen">
-       <aside 
-          :class="open ? 'w-64 translate-x-0' : 'w-20 -translate-x-full lg:translate-x-0'" 
-              class="fixed inset-y-0 left-0 z-50 flex-shrink-0 border-r border-slate-200 bg-white transition-all duration-300 ease-in-out flex flex-col overflow-hidden lg:sticky lg:top-0 lg:h-screen">
+        <aside 
+            :class="open ? 'w-64' : 'w-20'" 
+            class="fixed inset-y-0 left-0 z-50 flex-shrink-0 border-r border-slate-200 bg-white transition-all duration-300 ease-in-out flex flex-col overflow-hidden lg:static lg:translate-x-0">
+            
             <div class="p-4 flex items-center justify-between border-b border-slate-50 min-h-[160px] relative">
                 <div x-show="open" x-transition.opacity class="flex flex-col items-center justify-center text-center w-full">
                     <div class="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200 mb-4 rotate-3 hover:rotate-0 transition-transform duration-300">
@@ -106,30 +107,13 @@
                         </button>
                     </form>
                 </div>
-
-                @if(auth()->user()->role === 'admin')
-<div class="pt-4 mt-2 border-t border-slate-50">
-    <a href="{{ route('admin.users') }}" 
-       class="group flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.users') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}">
-        
-        <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.users') ? 'text-white' : 'text-slate-400 group-hover:text-slate-900' }}" 
-             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-        </svg>
-
-        <span x-show="open" class="text-sm font-bold uppercase tracking-tight whitespace-nowrap">Manajemen Akun</span>
-    </a>
-</div>
-@endif
-
             </nav>
 
            
         </aside>
 
-        <main 
-            :class="open ? 'lg:ml-64' : 'lg:ml-20'" 
-              class="flex-1 flex flex-col min-w-0 transition-all duration-300">
+        <main class="flex-1 flex flex-col">
+            <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
                 <div>
                     <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">kategori produk</h2>
                     <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
