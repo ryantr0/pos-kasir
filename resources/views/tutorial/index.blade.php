@@ -159,11 +159,7 @@
 
 {{-- MAIN CONTENT --}}
 <main class="flex-1 overflow-y-auto px-8 py-10">
-    <div class="mb-10">
-        <h2 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Pusat Bantuan</h2>
-        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">PANDUAN PENGGUNAAN FITUR</h1>
-        <p class="text-sm text-slate-500 mt-2">Pelajari cara mengelola operasional Warung RZ dengan efisien.</p>
-    </div>
+    
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @php
