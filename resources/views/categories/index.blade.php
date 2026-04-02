@@ -176,46 +176,47 @@
                 </form>
             </div>
 
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <table class="w-full text-left border-collapse">
+           <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-x-auto custom-scroll">
+                <table class="w-full text-left border-collapse min-w-[500px]">
                     <thead>
                         <tr class="bg-slate-50 border-b border-slate-100">
-                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nama Kategori</th>
-                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Jumlah Produk</th>
-                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Aksi</th>
+                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Nama Kategori</th>
+                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center whitespace-nowrap">Jumlah Produk</th>
+                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right whitespace-nowrap">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @forelse ($categories as $category)
                         <tr class="hover:bg-slate-50 transition-colors">
                             <td class="px-6 py-4">
-                                {{-- PERUBAHAN: Sekarang bisa diklik untuk buka Modal Produk --}}
                                 <button type="button" onclick="openCategoryModal({{ $category->id }}, '{{ $category->name }}')" class="text-left outline-none group">
-                                    <p class="text-sm font-black text-slate-800 uppercase tracking-wider not-italic">
+                                    <p class="text-sm font-black text-slate-800 uppercase tracking-wider whitespace-nowrap">
                                         {{ $category->name }}
                                     </p>
-                                    <p class="text-[10px] text-slate-400 uppercase tracking-tight not-italic">
+                                    <p class="text-[10px] text-slate-400 uppercase tracking-tight whitespace-nowrap">
                                         Slug: {{ $category->slug }} (Klik untuk detail)
                                     </p>
                                 </button>
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <span class="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-full">
+                                <span class="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-full whitespace-nowrap">
                                     {{ $category->products_count ?? 0 }} ITEM
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <form action="{{ route('categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Hapus kategori ini? Produk di dalamnya akan kehilangan kategori.')">
+                                <form action="{{ route('categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Hapus kategori ini?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="px-3 py-1.5 border border-red-100 text-[10px] font-bold text-red-500 rounded-md hover:bg-red-500 hover:text-white transition uppercase">Hapus</button>
+                                    <button type="submit" class="px-3 py-1.5 border border-red-100 text-[10px] font-bold text-red-500 rounded-md hover:bg-red-500 hover:text-white transition uppercase whitespace-nowrap">
+                                        Hapus
+                                    </button>
                                 </form>
                             </td>
                         </tr>
                         @empty
                         <tr>
                             <td colspan="3" class="py-20 text-center">
-                                <p class="text-slate-400 text-xs italic">Belum ada kategori. Silahkan tambah kategori pertama Abang!</p>
+                                <p class="text-slate-400 text-xs italic">Belum ada kategori.</p>
                             </td>
                         </tr>
                         @endforelse
