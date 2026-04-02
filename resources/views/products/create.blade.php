@@ -12,38 +12,7 @@
         .input-focus:focus { border-color: #0f172a; ring: 2px; ring-color: #0f172a; }
     </style>
 </head>
-<body class="bg-[#f8fafc] antialiased text-slate-900">
 
-<div class="flex min-h-screen">
-    <aside class="w-64 flex-shrink-0 border-r border-slate-200 bg-white flex flex-col">
-        <div class="p-8 flex flex-col items-center justify-center text-center border-b border-slate-50">
-    {{-- Logo Ikonik (Bulat Modern) --}}
-    <div class="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200 mb-4 rotate-3 hover:rotate-0 transition-transform duration-300">
-        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-        </svg>
-    </div>
-
-    {{-- Judul & Subtitle di Tengah --}}
-    <div>
-        <h1 class="text-xl font-black tracking-tighter text-slate-800 leading-none">WARUNG RZ</h1>
-        <div class="flex items-center justify-center space-x-1 mt-2">
-        </div>
-    </div>
-</div>
-        
-        <nav class="flex-1 px-4 space-y-1">
-            <a href="{{ route('products.index') }}" 
-            class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 
-            {{ request()->routeIs('products.*') ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
-                
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                </svg>
-                
-                <span class="text-sm font-medium">Produk</span>
-            </a>
-        </nav>
 
         
     </aside>

@@ -16,57 +16,34 @@
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
- <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
-            <div>
-                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Dashboard Overview</h2>
-                <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
-            </div>
-
-            <div class="flex items-center space-x-3">              
-                <div class="hidden md:flex flex-col items-end border-r border-slate-200 pr-3">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Hari ini</span>
-                    <span id="realtime-date" class="text-[11px] font-extrabold text-slate-700 uppercase">
-                        {{ date('l, d M Y') }} {{-- Tetap ada buat tampilan awal --}}
-                    </span>
-                </div>
-
-                <div class="bg-slate-900 px-4 py-2 rounded-xl shadow-lg shadow-slate-200 flex items-center space-x-2 border border-slate-800">
-                    <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span id="realtime-clock" class="text-sm font-black text-white tabular-nums tracking-widest">
-                        00:00:00
-                    </span>
-                </div>
-            </div>
-        </header>
-
-<body class="bg-[#f8fafc] antialiased text-slate-900" x-data="{ open: true }">
-    <div class="flex min-h-screen">
+<body class="bg-[#f8fafc] antialiased text-slate-900" x-data="Object.assign(posSystem(), { open: false })">
+    <div class="flex min-h-screen overflow-hidden">
+        
         <aside 
             :class="open ? 'w-64' : 'w-20'" 
-            class="flex-shrink-0 border-r border-slate-200 bg-white transition-all duration-300 ease-in-out flex flex-col overflow-hidden">
+            class="flex-shrink-0 border-r border-slate-200 bg-white transition-all duration-300 ease-in-out flex flex-col overflow-hidden relative">
             
-            <div class="p-4 flex items-center justify-between border-b border-slate-50 min-h-[160px]">
-                <div x-show="open" x-transition.opacity class="flex flex-col items-center justify-center text-center w-full">
-                    <div class="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200 mb-4 rotate-3 hover:rotate-0 transition-transform duration-300">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                        </svg>
-                    </div>
-                    <h1 class="text-xl font-black tracking-tighter text-slate-800 leading-none">WARUNG RZ</h1>
-                </div>
+            <div class="p-4 flex items-center justify-between border-b border-slate-50 min-h-[160px] relative">
+    
+    <div x-show="open" x-transition.opacity class="flex flex-col items-center justify-center text-center w-full">
+        <div class="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200 mb-4 rotate-3 hover:rotate-0 transition-transform duration-300">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+            </svg>
+        </div>
+        <h1 class="text-xl font-black tracking-tighter text-slate-800 leading-none">WARUNG RZ</h1>
+    </div>
 
-                <button @click="open = !open" class="p-2 rounded-lg hover:bg-slate-100 text-slate-500 absolute top-4 right-4">
-                    <svg x-show="open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
+    <button @click="open = !open" 
+            :class="open ? 'absolute top-4 right-4' : 'mx-auto'" 
+            class="p-2 rounded-lg hover:bg-slate-100 text-slate-500 transition-all duration-300">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+    </button>
+</div>
 
-                    <svg x-show="!open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-            </div>
-
-           <nav class="mt-4 px-4 space-y-1 flex-1 overflow-y-auto overflow-x-hidden">
+           <nav class="mt-4 px-4 space-y-1 flex-1 overflow-y-auto overflow-x-hidden custom-scroll">
                 <div x-show="open" class="px-3 py-2 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Main Menu</div>
                 
                 <a href="{{ route('dashboard') }}" 
@@ -138,12 +115,11 @@
                         </button>
                     </form>
                 </div>
-            </nav>
 
                 @if(auth()->user()->role === 'admin')
-                <div class="p-4 border-t border-slate-100 bg-white" x-show="open">
+                <div class="pt-4 mt-2 border-t border-slate-50">
                     <a href="{{ route('admin.users') }}" 
-                    class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.users') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}">
+                    class="group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.users') ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}">
                         <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.users') ? 'text-white' : 'text-slate-400 group-hover:text-slate-900' }}" 
                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
@@ -152,9 +128,37 @@
                     </a>
                 </div>
                 @endif
-            
+            </nav>
         </aside>
 
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+                <div>
+                    <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Dashboard Overview</h2>
+                    <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
+                </div>
+
+                <div class="flex items-center space-x-3">              
+                    <div class="hidden md:flex flex-col items-end border-r border-slate-200 pr-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Hari ini</span>
+                        <span id="realtime-date" class="text-[11px] font-extrabold text-slate-700 uppercase">
+                            {{ date('l, d M Y') }}
+                        </span>
+                    </div>
+
+                    <div class="bg-slate-900 px-4 py-2 rounded-xl shadow-lg shadow-slate-200 flex items-center space-x-2 border border-slate-800">
+                        <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span id="realtime-clock" class="text-sm font-black text-white tabular-nums tracking-widest">
+                            00:00:00
+                        </span>
+                    </div>
+                </div>
+             </header>
+
+            
+
+            
+        </aside>
         <main class="flex-1 flex flex-col bg-[#fcfcfc] min-w-0">
             <div class="p-6 overflow-y-auto custom-scroll">
                 <div class="mb-8 space-y-4">
@@ -266,7 +270,7 @@
             </div>
         </main>
 
-     <div x-data="{ showCart: true }" class="relative flex min-h-screen bg-slate-100 overflow-hidden">
+     <div x-data="{ showCart: false }" class="relative flex min-h-screen bg-slate-100 overflow-hidden">
 
     <button 
         x-show="!showCart" 
@@ -282,16 +286,21 @@
         <span class="absolute -top-1 -right-1 bg-red-500 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white" x-text="cart.length"></span>
     </button>
 
-    <aside 
-        x-show="showCart"
-        x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="translate-x-full"
-        x-transition:enter-end="translate-x-0"
-        x-transition:leave="transition ease-in duration-300"
-        x-transition:leave-start="translate-x-0"
-        x-transition:leave-end="translate-x-full"
-        class="fixed right-0 top-0 h-full w-80 bg-white border-l border-slate-200 flex flex-col shadow-xl z-40"
-    >
+ <aside 
+    x-show="showCart"
+    x-cloak
+    @click.away="showCart = false"
+    
+    x-transition:enter="transition transform ease-out duration-300 origin-right"
+    x-transition:enter-start="scale-95 translate-x-10 opacity-0"
+    x-transition:enter-end="scale-100 translate-x-0 opacity-100"
+    
+    x-transition:leave="transition transform ease-in duration-200 origin-right"
+    x-transition:leave-start="scale-100 translate-x-0 opacity-100"
+    x-transition:leave-end="scale-95 translate-x-10 opacity-0"
+    
+    class="fixed right-0 top-0 h-full w-80 bg-white border-l border-slate-200 flex flex-col shadow-2xl z-50"
+>
         <div class="p-5 border-b border-slate-50">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
