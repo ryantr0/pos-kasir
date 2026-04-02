@@ -129,12 +129,12 @@
                 </div>
                 @endif
             </nav>
-        </aside>
 
+        </aside>
         <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
             <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
                 <div>
-                    <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Dashboard Overview</h2>
+                    <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Kasir</h2>
                     <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
                 </div>
 
