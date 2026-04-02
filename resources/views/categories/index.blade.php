@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
+<body class="bg-[#f8fafc] antialiased text-slate-900">
+
 <body class="bg-[#f8fafc] antialiased text-slate-900" x-data="{ open: false }">
     <div class="flex min-h-screen">
         <aside 
@@ -106,20 +108,9 @@
                     </form>
                 </div>
             </nav>
+
+           
         </aside>
-
-        <div class="flex-1 flex flex-col min-w-0 transition-all duration-300" 
-             :class="open ? 'pl-64 lg:pl-0' : 'pl-20 lg:pl-0'">
-            
-            <main class="flex-1 overflow-y-auto">
-                <div class="p-6">
-                   @yield('content')
-                </div>
-            </main>
-        </div>
-
-    </div>
-</body>
 
         <main class="flex-1 flex flex-col">
             <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
