@@ -164,11 +164,9 @@
                     </span>
                 </div>
             </div>
-        
-            
         </header>
 
-         <div class="p-8">
+   <div class="p-8">
     {{-- AREA BARU UNTUK TOMBOL DI LUAR HEADER --}}
     <div class="flex justify-between items-center mb-6">
         <div>
@@ -181,87 +179,87 @@
         </a>
     </div>
 
-        <div class="p-8">
-            @if(session('success'))
-            <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 text-xs font-bold rounded-xl uppercase tracking-wide">
-                {{ session('success') }}
-            </div>
-            @endif
+    @if(session('success'))
+    <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 text-xs font-bold rounded-xl uppercase tracking-wide">
+        {{ session('success') }}
+    </div>
+    @endif
 
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 border-b border-slate-100">
-                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Info Produk</th>
-                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Kategori</th>
-                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Stok</th> {{-- TAMBAHKAN INI --}}
-                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Harga</th>
-                            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        @foreach ($products as $product)
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden border border-slate-200">
-                                        @if($product->image)
-                                            <img src="{{ asset('storage/' . $product->image) }}" 
-                                                class="w-full h-full object-cover"
-                                                onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($product->name) }}&color=7F9CF5&background=EBF4FF'">
-                                        @else
-                                            <div class="w-full h-full flex items-center justify-center text-[10px] text-slate-400 uppercase font-bold">No Img</div>
-                                        @endif
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-slate-800 uppercase tracking-tight">{{ $product->name }}</p>
-                                        <p class="text-[10px] text-slate-400 font-medium line-clamp-1 max-w-[200px]">{{ $product->description ?? 'Tidak ada deskripsi' }}</p>
-                                    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        {{-- TAMBAHKAN DIV INI UNTUK SCROLL HORIZONTAL --}}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[800px]"> {{-- Tambah min-w supaya tidak gepeng di HP --}}
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-100">
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Info Produk</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center whitespace-nowrap">Kategori</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center whitespace-nowrap">Stok</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Harga</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right whitespace-nowrap">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach ($products as $product)
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center space-x-4 min-w-[250px]"> {{-- Jaga lebar kolom Info Produk --}}
+                                <div class="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
+                                    @if($product->image)
+                                        <img src="{{ asset('storage/' . $product->image) }}" 
+                                            class="w-full h-full object-cover"
+                                            onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($product->name) }}&color=7F9CF5&background=EBF4FF'">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center text-[10px] text-slate-400 uppercase font-bold">No Img</div>
+                                    @endif
                                 </div>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-full uppercase italic">
-                                    {{ $product->category->name ?? 'Umum' }}
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800 uppercase tracking-tight">{{ $product->name }}</p>
+                                    <p class="text-[10px] text-slate-400 font-medium line-clamp-1 max-w-[200px]">{{ $product->description ?? 'Tidak ada deskripsi' }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center whitespace-nowrap">
+                            <span class="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-full uppercase italic">
+                                {{ $product->category->name ?? 'Umum' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center whitespace-nowrap">
+                            @if($product->stock <= 5)
+                                <span class="px-3 py-1 bg-red-50 text-red-600 text-[11px] font-black rounded-lg border border-red-100 animate-pulse">
+                                    {{ $product->stock }} (LIMIT)
                                 </span>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                @if($product->stock <= 5)
-                                    <span class="px-3 py-1 bg-red-50 text-red-600 text-[11px] font-black rounded-lg border border-red-100 animate-pulse">
-                                        {{ $product->stock }} (LIMIT)
-                                    </span>
-                                @elseif($product->stock <= 15)
-                                    <span class="px-3 py-1 bg-orange-50 text-orange-600 text-[11px] font-bold rounded-lg border border-orange-100">
-                                        {{ $product->stock }}
-                                    </span>
-                                @else
-                                    <span class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded-lg border border-emerald-100">
-                                        {{ $product->stock }}
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 text-sm font-black text-slate-900">
-                                Rp {{ number_format($product->price, 0, ',', '.') }}
-                            </td>
-                            <td class="px-6 py-4 text-right space-x-2">
-                                <a href="{{ route('products.edit', $product->id) }}" class="inline-block px-3 py-1.5 border border-slate-200 text-[10px] font-bold text-slate-600 rounded-md hover:bg-slate-900 hover:text-white transition">EDIT</a>
-                                <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="inline">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" onclick="return confirm('Hapus produk ini?')" class="px-3 py-1.5 border border-red-100 text-[10px] font-bold text-red-500 rounded-md hover:bg-red-500 hover:text-white transition">HAPUS</button>
-                                </form>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                
-                @if($products->isEmpty())
-                <div class="py-20 text-center">
-                    <p class="text-slate-400 text-xs italic">Produk masih kosong, ayo tambah dulu!</p>
-                </div>
-                @endif
-            </div>
+                            @elseif($product->stock <= 15)
+                                <span class="px-3 py-1 bg-orange-50 text-orange-600 text-[11px] font-bold rounded-lg border border-orange-100">
+                                    {{ $product->stock }}
+                                </span>
+                            @else
+                                <span class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded-lg border border-emerald-100">
+                                    {{ $product->stock }}
+                                </span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 text-sm font-black text-slate-900 whitespace-nowrap">
+                            Rp {{ number_format($product->price, 0, ',', '.') }}
+                        </td>
+                        <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                            <a href="{{ route('products.edit', $product->id) }}" class="inline-block px-3 py-1.5 border border-slate-200 text-[10px] font-bold text-slate-600 rounded-md hover:bg-slate-900 hover:text-white transition">EDIT</a>
+                            <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="inline">
+                                @csrf @method('DELETE')
+                                <button type="submit" onclick="return confirm('Hapus produk ini?')" class="px-3 py-1.5 border border-red-100 text-[10px] font-bold text-red-500 rounded-md hover:bg-red-500 hover:text-white transition">HAPUS</button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div> {{-- AKHIR DIV SCROLL --}}
+        
+        @if($products->isEmpty())
+        <div class="py-20 text-center">
+            <p class="text-slate-400 text-xs italic">Produk masih kosong, ayo tambah dulu!</p>
         </div>
-    </main>
+        @endif
+    </div>
 </div>
 
 <script>
