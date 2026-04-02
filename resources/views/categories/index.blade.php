@@ -12,10 +12,9 @@
 
 <body class="bg-[#f8fafc] antialiased text-slate-900" x-data="{ open: false }">
     <div class="flex min-h-screen">
-        <aside 
-            :class="open ? 'w-64' : 'w-20'" 
-            class="fixed inset-y-0 left-0 z-50 flex-shrink-0 border-r border-slate-200 bg-white transition-all duration-300 ease-in-out flex flex-col overflow-hidden lg:static lg:translate-x-0">
-            
+       <aside 
+          :class="open ? 'w-64 translate-x-0' : 'w-20 -translate-x-full lg:translate-x-0'" 
+              class="fixed inset-y-0 left-0 z-50 flex-shrink-0 border-r border-slate-200 bg-white transition-all duration-300 ease-in-out flex flex-col overflow-hidden lg:sticky lg:top-0 lg:h-screen">
             <div class="p-4 flex items-center justify-between border-b border-slate-50 min-h-[160px] relative">
                 <div x-show="open" x-transition.opacity class="flex flex-col items-center justify-center text-center w-full">
                     <div class="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200 mb-4 rotate-3 hover:rotate-0 transition-transform duration-300">
@@ -128,8 +127,9 @@
            
         </aside>
 
-        <main class="flex-1 flex flex-col">
-            <header class="h-20 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+        <main 
+            :class="open ? 'lg:ml-64' : 'lg:ml-20'" 
+              class="flex-1 flex flex-col min-w-0 transition-all duration-300">
                 <div>
                     <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">kategori produk</h2>
                     <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Warung RZ </p>
