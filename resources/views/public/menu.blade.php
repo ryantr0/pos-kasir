@@ -28,53 +28,64 @@
             <h1 class="text-[10px] font-black tracking-tighter text-slate-800 uppercase hidden sm:block">WARUNG RZ</h1>
         </div>
 
-        <div class="flex items-center">
-            <button 
-                @click="open = !open" 
-                type="button"
-                :class="open ? 'bg-rose-500 shadow-rose-200' : 'bg-slate-900 shadow-slate-200'"
-                class="flex items-center space-x-2 px-4 py-1.5 rounded-full shadow-lg transition-all duration-300 active:scale-95 group cursor-pointer"
-            >
-               
+<div class="relative flex flex-col items-center mt-4 mb-4">
+    
+    <button 
+        @click="open = !open" 
+        type="button"
+        class="relative z-[120] flex items-center space-x-2 px-2 py-1.5 transition-all duration-300 active:scale-95 group cursor-pointer bg-transparent border-none"
+    >
+        <span 
+            class="text-[11px] font-black uppercase tracking-[0.2em] text-black"
+            x-text="open ? 'TUTUP' : 'daftar menu'"
+        ></span>
 
-                <span 
-                    class="text-[10px] font-black uppercase tracking-[0.2em] text-white"
-                    x-text="open ? 'TUTUP' : 'daftar menu'"
-                ></span>
-
-                
-            </button>
-        </div>
-
-        <div 
-            x-show="open" 
-            x-cloak
-            @click.away="open = false"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 -translate-y-4"
-            x-transition:enter-end="opacity-100 translate-y-0"
-            class="absolute top-full left-0 w-full bg-white border-b border-x border-slate-100 shadow-2xl z-[100] p-6 rounded-b-3xl mt-0"
+        <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            class="h-5 w-5 text-black" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor" 
+            stroke-width="2.5"
         >
-            <div class="flex flex-wrap gap-2 justify-center">
-                <button 
-                    type="button"
-                    @click="activeCategory = 'all'; open = false"
-                    :class="activeCategory === 'all' ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'border border-slate-200 bg-white text-slate-600'"
-                    class="px-6 py-2.5 rounded-full text-[10px] font-bold transition-all uppercase whitespace-nowrap">
-                    SEMUA
-                </button>
+            <path x-cloak x-show="!open" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            <path x-cloak x-show="open" stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+</div>
 
-                @foreach($categories as $category)
-                <button 
-                    type="button"
-                    @click="activeCategory = '{{ Str::slug($category->name) }}'; open = false"
-                    :class="activeCategory === '{{ Str::slug($category->name) }}' ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'border border-slate-200 bg-white text-slate-600'"
-                    class="px-6 py-2.5 rounded-full text-[10px] font-bold transition-all uppercase whitespace-nowrap">
-                    {{ $category->name }}
-                </button>
-                @endforeach
-            </div>
+<div 
+        x-show="open" 
+        x-cloak
+        @click.away="open = false"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 -translate-y-4 scale-95"
+        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+        /* mt-[-12px] menarik kotak ke atas agar tombol masuk ke area putih */
+        /* pt-16 memberi ruang di atas supaya kategori tidak tertutup tombol TUTUP */
+        class="absolute top-0 mt-[-12px] w-[calc(100%-3rem)] max-w-sm bg-white border border-slate-50 shadow-2xl z-[100] pt-16 pb-8 px-6 rounded-[2.5rem]"
+    >
+        <div class="relative z-[110] flex flex-col gap-3 items-center w-full"> 
+            
+            <button 
+                type="button"
+                @click="activeCategory = 'all'; open = false"
+                :class="activeCategory === 'all' ? 'bg-slate-900 text-white shadow-lg' : 'border border-slate-100 bg-white text-slate-700'"
+                class="w-full px-6 py-3.5 rounded-full text-[11px] font-semibold transition-all uppercase tracking-wider cursor-pointer">
+                SEMUA
+            </button>
+
+            @foreach($categories as $category)
+            <button 
+                type="button"
+                @click="activeCategory = '{{ Str::slug($category->name) }}'; open = false"
+                :class="activeCategory === '{{ Str::slug($category->name) }}' ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' : 'border border-slate-200 bg-white text-slate-600'"
+                class="w-full px-6 py-3.5 rounded-full text-[11px] font-bold transition-all uppercase tracking-wider cursor-pointer">
+                {{ $category->name }}
+            </button>
+            @endforeach
         </div>
+    </div>
     </div>
 </header>
 
