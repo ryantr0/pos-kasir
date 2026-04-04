@@ -13,6 +13,7 @@ use App\Http\Controllers\KasirController;
 use App\Http\Controllers\PurchaseController;
 use App\Models\Product;
 use App\Http\Controllers\AIChatController;
+use App\Http\Controllers\PublicKatalogController;
 
 // 1. Landing Page
 Route::get('/', function () {
@@ -21,8 +22,13 @@ Route::get('/', function () {
 
 });
 
+Route::get('/menu', [App\Http\Controllers\PublicKatalogController::class, 'index'])->name('public.menu');
+
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+
+
+
 
 
 
