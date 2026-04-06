@@ -20,12 +20,7 @@
     <div class="max-w-4xl mx-auto flex items-center justify-between relative h-10">
         
         <div class="flex items-center space-x-3 z-10 w-32">
-            <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                </svg>
-            </div>
-            <h1 class="text-[10px] font-black tracking-tighter text-slate-800 uppercase hidden sm:block">WARUNG RZ</h1>
+            <h1 class="text-[20px] font-black tracking-tighter text-slate-800 uppercase hidden sm:block">WARUNG RZ MENU</h1>
         </div>
 
 <div class="relative flex flex-col items-center mt-4 mb-4">
@@ -72,7 +67,7 @@
                 @click="activeCategory = 'all'; open = false"
                 :class="activeCategory === 'all' ? 'bg-slate-900 text-white shadow-lg' : 'border border-slate-100 bg-white text-slate-700'"
                 class="w-full px-6 py-3.5 rounded-full text-[11px] font-semibold transition-all uppercase tracking-wider cursor-pointer">
-                SEMUA
+                SEMUA MENU
             </button>
 
             @foreach($categories as $category)
