@@ -20,7 +20,7 @@
     <div class="max-w-4xl mx-auto flex items-center justify-between relative h-10">
         
         <div class="flex items-center space-x-3 z-10 w-32">
-            <h1 class="text-[15px] font-black tracking-tighter text-slate-800 uppercase hidden sm:block">WARUNG RZ MENU</h1>
+            <h1 class="text-[15px] font-black tracking-tighter text-slate-800 uppercase ">WARUNG RZ MENU</h1>
         </div>
 
 <div class="relative flex flex-col items-center mt-4 mb-4">
