@@ -18,10 +18,10 @@
     
     <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-[100] px-4 py-3 shadow-sm">
     <div class="max-w-4xl mx-auto flex items-center justify-between relative h-10">
+        <button
+         class="flex items-center space-x-3 z-10 w-32">
+            <h1 class="text-[10px] font-black tracking-tighter text-slate-800 uppercase ">WARUNG RZ MENU</h1>
         
-        <div class="flex items-center space-x-3 z-10 w-32">
-            <h1 class="text-[15px] font-black tracking-tighter text-slate-800 uppercase ">WARUNG RZ MENU</h1>
-        </div>
 
 <div class="relative flex flex-col items-center mt-4 mb-4">
     
@@ -58,7 +58,7 @@
         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
         /* mt-[-12px] menarik kotak ke atas agar tombol masuk ke area putih */
         /* pt-16 memberi ruang di atas supaya kategori tidak tertutup tombol TUTUP */
-        class="absolute top-0 mt-[-12px] w-[calc(100%-3rem)] max-w-sm bg-white border border-slate-50 shadow-2xl z-[100] pt-16 pb-8 px-6 rounded-[2.5rem]"
+        class="absolute top-0 mt-[-10px] w-[calc(100%-3rem)] max-w-sm bg-white border border-slate-80 shadow-2xl z-[100] py-12 pb-10 px-8 rounded-[2.5rem]"
     >
         <div class="relative z-[110] flex flex-col gap-3 items-center w-full"> 
             
